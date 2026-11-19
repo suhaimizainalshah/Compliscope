@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Compliscope</title>
+<style>
+:root{--bg:#fff;--panel:#f5f7fa;--ink:#101828;--muted:#5b6577;--line:#e3e8ef;--accent:#0f766e;--accent2:#14b8a6;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#12161c;--panel:#1a2029;--ink:#eef2f6;--muted:#9aa5b5;--line:#2a323d;--accent:#2dd4bf;--accent2:#5eead4;color-scheme:dark}}
+*{box-sizing:border-box}[hidden]{display:none!important}html,body{margin:0}
+body{width:360px;background:var(--bg);color:var(--ink);font:13.5px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
+button{font:inherit;color:inherit;cursor:pointer}:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:10px}
+header{display:flex;align-items:center;gap:10px;padding:14px 16px 6px}header img{width:30px;height:30px}header h1{margin:0;font-size:17px}header span{margin-left:auto;color:var(--muted);font-size:11.5px}
+main{padding:6px 16px 14px;display:grid;gap:12px}
+.site{padding:10px 12px;border-radius:12px;background:var(--panel);font-size:12.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.site b{color:var(--ink);font-size:14px}
+.go{height:46px;border:0;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-weight:800;font-size:15px}
+.go:disabled{opacity:.5;cursor:default}
+.laws{display:flex;gap:6px;flex-wrap:wrap;align-items:center}.chip{padding:3px 9px;border-radius:999px;border:1px solid var(--line);font-size:12px;font-weight:600}
+.link{border:0;background:none;color:var(--accent);font-weight:700;padding:0;font-size:12.5px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}.ghost{height:40px;border:1px solid var(--line);border-radius:10px;background:var(--bg);font-weight:650}.ghost:hover{background:var(--panel)}
+h2{margin:0;font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.hist{display:grid;gap:4px}.hist button{display:flex;align-items:center;gap:10px;width:100%;padding:7px 8px;border:1px solid var(--line);border-radius:10px;background:var(--bg);text-align:left}
+.g{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;font-weight:800;color:#fff;flex:none}.hist span:not(.g){overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}.hist small{color:var(--muted)}
+.err{padding:9px 11px;border-radius:10px;background:#fee4e2;color:#7a271a;font-size:12.5px}
+footer{padding:9px 16px;border-top:1px solid var(--line);font-size:11.5px;color:var(--muted)}
+</style></head><body>
+<header><img src="icons/icon48.png" alt=""><h1>Compliscope</h1><span id="ver"></span></header>
+<main>
+  <div class="site" id="site"><b>This site</b></div>
+  <button class="go" id="audit">Audit this site</button>
+  <div class="err" id="err" hidden></div>
+  <div class="laws"><span style="color:var(--muted);font-size:12px">Checking against</span><span id="laws"></span><button class="link" id="change">Change</button></div>
+  <div class="row"><button class="ghost" id="nav">Readiness navigator</button><button class="ghost" id="atlas">AI and data atlas</button></div><button class="link" id="history" style="justify-self:start">Past audits</button>
+  <section id="histSec" hidden><h2>Recent audits</h2><div class="hist" id="hist" style="margin-top:6px"></div></section>
+</main>
+<footer>Passive checks only: Compliscope reads what any visitor’s browser can see. Not legal advice.</footer>
+<script src="laws.js"></script><script src="rules.js"></script><script src="popup.js"></script>
+</body></html>
