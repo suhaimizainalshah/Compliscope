@@ -7,8 +7,14 @@ function probe() {
   try { if (window.angular?.version) add("AngularJS", angular.version.full); } catch {}
   try { if (window._?.VERSION) add(typeof window._.flatMapDeep === "function" ? "Lodash" : "Underscore", window._.VERSION); } catch {}
   try { add("Moment.js", window.moment?.version); add("Handlebars", window.Handlebars?.VERSION); add("DOMPurify", window.DOMPurify?.version); add("React", window.React?.version); add("Vue", window.Vue?.version); } catch {}
+  // "drift" on its own is a generic word (animation classes, a site's own
+  // "drift" variable); only Drift's chat API object counts. The other
+  // globals (Intercom, zE, tidioChatApi, $crisp, Tawk_API,
+  // HubSpotConversations) are vendor-specific names.
+  const drift = window.drift;
+  const driftApi = drift && ["identify", "page", "track", "config"].some(m => typeof drift[m] === "function") ? drift : null;
   return { libs, tcf: typeof window.__tcfapi === "function", gpp: typeof window.__gpp === "function",
-    chatGlobals: [["Intercom", window.Intercom], ["Drift", window.drift], ["Zendesk", window.zE], ["Tidio", window.tidioChatApi], ["Crisp", window.$crisp], ["tawk.to", window.Tawk_API], ["HubSpot Chat", window.HubSpotConversations]].filter(x => x[1]).map(x => x[0]) };
+    chatGlobals: [["Intercom", window.Intercom], ["Drift", driftApi], ["Zendesk", window.zE], ["Tidio", window.tidioChatApi], ["Crisp", window.$crisp], ["tawk.to", window.Tawk_API], ["HubSpot Chat", window.HubSpotConversations]].filter(x => x[1]).map(x => x[0]) };
 }
 const URL_LIBS = [[/jquery[.-](\d+\.\d+\.\d+)/i, "jQuery"], [/jquery@(\d+\.\d+\.\d+)/i, "jQuery"], [/jquery-ui[.-](\d+\.\d+\.\d+)/i, "jQuery UI"], [/bootstrap[@/.-](\d+\.\d+\.\d+)/i, "Bootstrap"], [/angular(?:js)?[@/.-](1\.\d+\.\d+)/i, "AngularJS"], [/lodash[@/.-](\d+\.\d+\.\d+)/i, "Lodash"], [/moment[@/.-](\d+\.\d+\.\d+)/i, "Moment.js"], [/handlebars[@/.-](\d+\.\d+\.\d+)/i, "Handlebars"], [/underscore[@/.-](\d+\.\d+\.\d+)/i, "Underscore"]];
 let lastId = 0;
