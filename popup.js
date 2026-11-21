@@ -18,7 +18,7 @@ const open = h => { chrome.tabs.create({ url: "app.html" + h }); window.close();
 })();
 $("#audit").onclick = async () => {
   $("#audit").disabled = true; $("#audit").textContent = "Auditing…"; $("#err").hidden = true;
-  const r = await chrome.runtime.sendMessage({ type: "audit" });
+  let r; try { r = await chrome.runtime.sendMessage({ type: "audit" }); } catch { r = { error: "Could not reach the background service. Try again in a moment." }; }
   if (r?.error) { $("#err").hidden = false; $("#err").textContent = r.error; $("#audit").disabled = false; $("#audit").textContent = "Audit this site"; return; }
   open("#audit=" + r.id);
 };

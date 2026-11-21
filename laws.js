@@ -27,11 +27,11 @@
       name: "EU AI Act", short: "AI Act", region: "European Union / EEA", default: true, url: "https://eur-lex.europa.eu/eli/reg/2024/1689/oj",
       note: "Regulation (EU) 2024/1689, as amended by the Digital Omnibus, Regulation (EU) 2026/1744. Prohibitions and AI literacy since 2 Feb 2025; Article 50 transparency since 2 Aug 2026; Annex III high-risk duties from 2 Dec 2027.",
       refs: {
-        ai_disclosure: ["AI Act Art. 50(1) (people must be told they are interacting with an AI system), applies since 2 Aug 2026"],
+        ai_disclosure: ["AI Act Art. 50(1) (people must be told they are interacting with an AI system), applies since 2 Aug 2026", "AI Act Art. 50(3) (deployers of emotion-recognition or biometric categorisation systems must inform the people concerned), applies since 2 Aug 2026"],
         ai_marking: ["AI Act Art. 50(2) (machine-readable marking of AI-generated content; systems already on the market have until 2 Dec 2026)"],
         ai_deepfake: ["AI Act Art. 50(4) (disclose deepfakes and AI-generated text published on matters of public interest)"],
         ai_highrisk: ["AI Act Art. 6 and Annex III (high-risk uses in education, employment, essential services and credit), duties apply from 2 Dec 2027", "AI Act Art. 26 (duties of deployers of high-risk AI)", "AI Act Art. 27 (fundamental rights impact assessment for public bodies and providers of public services)"],
-        ai_prohibited: ["AI Act Art. 5(1)(f) (emotion recognition in workplaces and education is banned, except for medical or safety reasons)", "AI Act Art. 5(1)(c) (social scoring is banned)", "AI Act Art. 5(1)(g) (biometric categorisation to infer sensitive traits is banned)"],
+        ai_prohibited: ["AI Act Art. 5(1)(f) (emotion recognition in workplaces and education is banned, except for medical or safety reasons)", "AI Act Art. 5(1)(c) (social scoring is banned)", "AI Act Art. 5(1)(g) (biometric categorisation to infer sensitive traits is banned)", "AI Act Art. 5(1)(ba) (AI-generated non-consensual intimate images are banned, applies from 2 Dec 2026)", "AI Act Art. 5(1)(bb) (AI-generated child sexual abuse material is banned, applies from 2 Dec 2026)"],
         ai_literacy: ["AI Act Art. 4 (AI literacy), as amended by Regulation (EU) 2026/1744"],
         ai_security: ["AI Act Art. 15 (accuracy, robustness and cybersecurity for high-risk AI)"],
       },
@@ -102,12 +102,12 @@
         consent_cookies: ["DPA s12(a) (consent as a criterion for lawful processing)"], transparency: ["DPA s16 (right to be informed)"], contact: ["DPA s21 (accountability; designate a responsible person)"],
         transfers: ["DPA s21 (accountability for transfers)"], security: ["DPA s20 (security of personal information)"], special: ["DPA s13 (sensitive personal information)"],
         breach: ["DPA s20(f) and NPC Circular 16-03 (notify within 72 hours)"],
-        ai_disclosure: ["NPC Advisory on AI systems processing personal data (2024): transparency"], ai_highrisk: ["NPC Advisory on AI systems processing personal data (2024): fairness and accountability"],
+        ai_disclosure: ["NPC Advisory on AI systems processing personal data (2024): transparency", "Executive Order 131 (2026): national AI Governance Framework; tell people when they interact with AI"], ai_highrisk: ["NPC Advisory on AI systems processing personal data (2024): fairness and accountability", "Executive Order 131 (2026): National AI Council and AI Governance Framework"],
       },
     },
     IN: {
       name: "India Digital Personal Data Protection Act 2023", short: "India", region: "India", url: "https://www.meity.gov.in/",
-      note: "The DPDP Rules 2025 phase the Act in: core duties apply from 14 May 2027. AI-generated content rules under the IT Rules have applied since 20 February 2026.",
+      note: "The DPDP Rules 2025 phase the Act in: core duties apply from 13 May 2027. AI-generated content rules under the IT Rules have applied since 20 February 2026.",
       refs: {
         consent_cookies: ["DPDP Act s6 (consent)"], dark_patterns: ["DPDP Act s6(1) (consent must be free, specific, informed, unconditional and unambiguous)"], transparency: ["DPDP Act s5 (notice)"],
         contact: ["DPDP Act s8(9) (publish contact details of the DPO or responsible person)"], transfers: ["DPDP Act s16 (transfers outside India)"], security: ["DPDP Act s8(5) (reasonable security safeguards)"],
@@ -137,6 +137,19 @@
         dpia: ["PIPL Art. 55–56 (personal information protection impact assessment)"],
         ai_deepfake: ["Measures for Labelling AI-Generated and Synthetic Content (in force 1 Sep 2025)", "Provisions on Deep Synthesis Internet Information Services (2023)"], ai_marking: ["Labelling Measures (2025) and mandatory standard GB 45438-2025 (implicit metadata labels)"],
         ai_disclosure: ["Interim Measures for Generative AI Services (2023)"],
+      },
+    },
+    KR: {
+      name: "South Korea AI Basic Act and PIPA", short: "South Korea", region: "South Korea", verify: true, url: "https://www.msit.go.kr/eng/index.do",
+      note: "Framework Act on the Development of Artificial Intelligence and the Establishment of a Foundation for Trust (AI Basic Act, Act No. 20676), in force since 22 January 2026. MSIT is deferring fines and fact-finding for at least one year except in serious cases. The Personal Information Protection Act (PIPA) also applies.",
+      refs: {
+        consent_cookies: ["PIPA (consent for collecting and using personal information)"], transparency: ["AI Basic Act Art. 31 (tell users in advance when a product or service uses high-impact or generative AI)"], contact: ["AI Basic Act (domestic representative for overseas operators above the thresholds)"],
+        transfers: ["PIPA (cross-border transfer rules)"], security: ["PIPA (security measures for personal information)"], special: ["PIPA (sensitive personal information)"],
+        children: ["PIPA (children's personal information)"], breach: ["PIPA (breach notification to the PIPC and affected people)"],
+        ai_disclosure: ["AI Basic Act Art. 31 (notify users in advance; label generative AI output, including deepfakes)"],
+        ai_deepfake: ["AI Basic Act Art. 31 (label AI-generated output so users can recognise it)", "Act on Special Cases Concerning the Punishment of Sexual Crimes (deepfake offences)"],
+        ai_marking: ["AI Basic Act Art. 31 (labelling of generative AI output; visible labels or invisible watermarks)"],
+        ai_highrisk: ["AI Basic Act Arts. 33–35 (high-impact AI: risk management, explanation, user protection and human oversight)"],
       },
     },
     PK: {
