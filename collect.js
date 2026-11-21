@@ -105,7 +105,22 @@
   /* AI: chat widgets, disclosures, client-side AI calls, sensitive uses */
   const tp = Object.values(D.thirdParties);
   D.chat = tp.filter(t => t.cat === "chat").map(t => t.name);
-  const chatEls = [...document.querySelectorAll("iframe,div,section,aside,button")].filter(e => /chat|bot|assistant|messenger|intercom|drift|zendesk|tidio|crisp|tawk|livechat/i.test((e.id + " " + e.className + " " + (e.title || "") + " " + (e.getAttribute("aria-label") || "")).toString()) && vis(e)).slice(0, 10);
+  // Chat-widget DOM detection (word matching lives in trackers.js
+  // matchChatElement). The old test matched bare substrings, so ordinary
+  // page furniture was reported as a chat widget: "bot" inside "bottom"
+  // (footer bottom bars, mobile bottom nav), "crisp" inside "crispy",
+  // "chat" inside any "chatting" class. Now vendor names and
+  // "chat"+widget-part names must match as whole words, and a bare
+  // "chat"/"bot"/"assistant"/"drift" word only counts for a fixed launcher
+  // or an element whose visible text invites a conversation.
+  const chatEls = [...document.querySelectorAll("iframe,div,section,aside,button")].filter(e => {
+    const attrs = { id: e.id || "", className: typeof e.className === "string" ? e.className : "", title: e.title || "", ariaLabel: e.getAttribute("aria-label") || "" };
+    const v = TR.matchChatElement(attrs, "", "");
+    if (v === true) return vis(e);
+    if (v !== "weak") return false;
+    if (!vis(e)) return false;
+    return TR.matchChatElement(attrs, getComputedStyle(e).position, txt(e).slice(0, 200)) === true;
+  }).slice(0, 10);
   if (chatEls.length && !D.chat.length) D.chat.push("Chat widget");
   const chatText = chatEls.map(e => (e.tagName === "IFRAME" ? e.title || "" : txt(e)) + " " + (e.getAttribute("aria-label") || "")).join(" ").slice(0, 3000);
   D.chatCrossOrigin = chatEls.some(e => e.tagName === "IFRAME" && hostOf(e.src) && !sameSite(hostOf(e.src)));
