@@ -30,7 +30,7 @@ async function renderAudit(v, id) {
   const audits = await getAudits(); if (!id) id = Object.keys(audits).sort().pop();
   const d = audits[id];
   if (!d) { v.innerHTML = `<div class="empty card"><h1>No audit yet</h1><p class="muted">Open any website, click the Compliscope icon and choose “Audit this site”.</p></div>`; return; }
-  const J = await getJ(), F = R.audit(d), S = R.score(F);
+  const J = await getJ(), F = R.audit(d, J), S = R.score(F);
   const order = { fail: 0, warn: 1, info: 2, pass: 3 }, sev = { high: 0, medium: 1, low: 2 };
   F.sort((a, b) => order[a.status] - order[b.status] || sev[a.severity] - sev[b.severity]);
   const tp = Object.values(d.thirdParties || {});
@@ -38,7 +38,7 @@ async function renderAudit(v, id) {
   v.innerHTML = `
   <section class="card hero">
     <div class="grade" style="background:${GC[S.grade]}" role="img" aria-label="Grade ${S.grade}, score ${S.score} out of 100"><div>${S.grade}<small>${S.score}/100</small></div></div>
-    <div><h1>${esc(d.host)}</h1><div class="meta"><span>${esc(d.title || "").slice(0, 90)}</span><span>${new Date(d.id).toLocaleString()}</span><span>${d.mode === "first-visit" ? "Tested as a new visitor" : "Tested in your current session"}</span></div>
+    <div><h1>${esc(d.host)}</h1><div class="meta"><span>${esc((d.title || "").slice(0, 90))}</span><span>${new Date(d.id).toLocaleString()}</span><span>${d.mode === "first-visit" ? "Tested as a new visitor" : "Tested in your current session"}</span></div>
       <div class="lawbar"><span class="muted" style="font-size:13px">Checked against</span>${J.map(k => `<span class="lawchip">${esc(LAWS[k]?.short || k)}</span>`).join("")}<span class="lawchip">Security basics</span><a href="#laws" style="font-size:13px;font-weight:650">Change</a></div></div>
     <div class="actions"><button class="btn primary" id="retest" title="Clears this site’s cookies and storage, reloads it and audits again">Re-test as a new visitor</button><button class="btn" id="pdf">Save as PDF</button><button class="btn" id="json">JSON</button><button class="btn" id="csv">CSV</button></div>
   </section>
@@ -49,7 +49,7 @@ async function renderAudit(v, id) {
   <details class="card" style="margin-top:14px"><summary style="cursor:pointer;font-weight:700">Third parties seen (${tp.length}) and cookies (${(d.cookies || []).length})</summary>
     <div style="overflow:auto;margin-top:10px"><table style="width:100%;border-collapse:collapse;font-size:13.5px"><thead><tr style="text-align:left"><th style="padding:6px">Service</th><th style="padding:6px">Company</th><th style="padding:6px">Type</th><th style="padding:6px">Country</th><th style="padding:6px">Requests</th></tr></thead><tbody>${tp.sort((a, b) => (b.tracking - a.tracking) || b.count - a.count).map(t => `<tr style="border-top:1px solid var(--line)"><td style="padding:6px">${esc(t.name)}</td><td style="padding:6px">${esc(t.company || "Unknown")}</td><td style="padding:6px">${esc(t.cat)}</td><td style="padding:6px">${esc(t.country || "")}</td><td style="padding:6px">${t.count}</td></tr>`).join("")}</tbody></table>
     <p class="muted" style="font-size:13px">Cookies (${d.cookieSource === "browser" ? "read by the browser" : "only cookies visible to page scripts"}): ${(d.cookies || []).map(c => esc(c.name)).join(", ") || "none"}</p></div></details>
-  <p class="disc">Compliscope makes passive checks only, using what any visitor’s browser receives. Results are indicative, not legal advice, and some issues can only be confirmed by people who run the site. Laws marked “check the official text” have newer or less settled section numbering.</p>`;
+  <p class="disc">Compliscope checks what any visitor’s browser receives, and re-requests the page once for its headers. It also fetches the site’s security.txt file and, for the secrets check, a few of the site’s own scripts — all of these requests go to the site being audited, and nothing is sent anywhere else. Results are indicative, not legal advice, and some issues can only be confirmed by people who run the site. Laws marked “check the official text” have newer or less settled section numbering.</p>`;
   const draw = () => {
     const list = F.filter(f => filter === "all" ? true : filter === "problems" ? f.status === "fail" || f.status === "warn" : filter === "pass" ? f.status === "pass" : f.cat === filter);
     $("#list").innerHTML = list.length ? list.map((f, i) => card(f, J, i < 3 && f.status === "fail")).join("") : `<p class="muted card">Nothing here. ${filter === "problems" ? "No problems found." : ""}</p>`;
@@ -59,13 +59,13 @@ async function renderAudit(v, id) {
   $("#pdf").onclick = () => { $$(".find").forEach(x => (x.open = true)); setTimeout(() => print(), 50); };
   const rows = F.map(f => ({ category: CAT[f.cat], status: ST[f.status][1], severity: f.severity, finding: f.title, evidence: f.found.join(" | "), fix: f.fix || "", laws: R.refsFor(f, J).map(r => `${r.name}: ${r.refs.join("; ")}`).join(" || ") }));
   $("#json").onclick = () => download(`compliscope-${d.host}-${new Date(d.id).toISOString().slice(0, 10)}.json`, JSON.stringify({ site: d.url, audited: new Date(d.id).toISOString(), mode: d.mode, grade: S.grade, score: S.score, jurisdictions: J, findings: rows, thirdParties: tp }, null, 2), "application/json");
-  $("#csv").onclick = () => { const cols = Object.keys(rows[0]); download(`compliscope-${d.host}.csv`, "\ufeff" + [cols, ...rows.map(r => cols.map(c => r[c]))].map(r => r.map(x => /[",\n]/.test(String(x)) ? `"${String(x).replace(/"/g, '""')}"` : x).join(",")).join("\r\n"), "text/csv"); };
+  $("#csv").onclick = () => { const cols = Object.keys(rows[0]); download(`compliscope-${d.host}.csv`, "\ufeff" + [cols, ...rows.map(r => cols.map(c => r[c]))].map(r => r.map(x => { const s = String(x); const q = /^[=+\-@]/.test(s) ? "'" + s : s; return /[",\n]/.test(q) ? `"${q.replace(/"/g, '""')}"` : q; }).join(",")).join("\r\n"), "text/csv"); };
   $("#retest").onclick = async () => {
     const origin = new URL(d.url).origin + "/*";
     let ok = await chrome.permissions.contains({ origins: [origin] }); if (!ok) ok = await chrome.permissions.request({ origins: [origin] });
     if (!ok) return toast("Permission is needed to clear and reload this site.");
-    const b = $("#retest"); b.disabled = true; b.textContent = "Re-testing… (about 10 seconds)";
-    const r = await chrome.runtime.sendMessage({ type: "retest", url: d.url, tabId: d.tabId });
+    const b = $("#retest"); b.disabled = true; b.textContent = "Re-testing… (this can take up to 30 seconds)";
+    let r; try { r = await chrome.runtime.sendMessage({ type: "retest", url: d.url, tabId: d.tabId }); } catch { r = { error: "Could not reach the background service. Try again in a moment." }; }
     if (r?.error) { toast(r.error); b.disabled = false; b.textContent = "Re-test as a new visitor"; return; }
     chrome.tabs.getCurrent(t => t && chrome.tabs.update(t.id, { active: true })); location.hash = "audit=" + r.id;
   };
@@ -83,7 +83,7 @@ async function renderLaws(v) {
   v.innerHTML = `<h1>Which laws should Compliscope check?</h1><p class="muted" style="max-width:70ch">Choose the places where your organisation works or where the people you serve live. The EU GDPR and EU AI Act are on by default. Security basics are always checked. Every finding shows the matching sections for each law you choose.</p>
   <div class="grid2" style="margin-top:18px">${Object.entries(LAWS).map(([k, l]) => `<label class="lawcard"><input type="checkbox" value="${k}" ${J.includes(k) ? "checked" : ""}><span><b>${esc(l.name)}</b><small>${esc(l.region)}${l.verify ? " · section numbers to double-check" : ""}</small>${l.note ? `<small style="margin-top:4px">${esc(l.note)}</small>` : ""}</span></label>`).join("")}</div>
   <div style="display:flex;gap:8px;margin-top:18px"><button class="btn primary" id="saveLaws">Save</button><button class="btn" id="resetLaws">Back to GDPR and AI Act only</button></div>`;
-  $("#saveLaws").onclick = async () => { const sel = $$(".lawcard input:checked").map(i => i.value); await chrome.storage.sync.set({ jurisdictions: sel.length ? sel : DEFAULT }); toast("Saved. Reports now show these laws."); history.length > 1 && document.referrer.includes("audit") ? history.back() : null; };
+  $("#saveLaws").onclick = async () => { const sel = $$(".lawcard input:checked").map(i => i.value); await chrome.storage.sync.set({ jurisdictions: sel.length ? sel : DEFAULT }); toast("Saved. Reports now show these laws."); let back = false; try { const ref = new URL(document.referrer); back = history.length > 1 && ref.pathname.endsWith("/app.html") && ref.origin === location.origin; } catch {} if (back) history.back(); };
   $("#resetLaws").onclick = async () => { await chrome.storage.sync.set({ jurisdictions: DEFAULT }); renderLaws(v); toast("Reset to GDPR and AI Act"); };
 }
 
@@ -132,6 +132,6 @@ function renderWelcome(v) {
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px"><a class="btn primary" href="#navigator">Start the readiness navigator</a><a class="btn" href="#atlas">Explore the AI and data atlas</a><a class="btn" href="#laws">Choose your laws</a></div></div>
     <div class="card"><b>Built for small teams</b><p class="muted" style="margin:.4rem 0 0">Schools, charities, NGOs and non-profits across different countries can check their own websites and get a plain-language plan in the Readiness navigator.</p></div></section>
   <section class="steps"><div class="card"><b>1. Open a website</b><p class="muted" style="margin:.3rem 0 0">Your own site, or one you’re assessing, such as a supplier or partner.</p></div><div class="card"><b>2. Click “Audit this site”</b><p class="muted" style="margin:.3rem 0 0">Then “Re-test as a new visitor” to check what loads before consent.</p></div><div class="card"><b>3. Fix and share</b><p class="muted" style="margin:.3rem 0 0">Each finding says why it matters and what to do. Save the report as a PDF for your board or IT provider.</p></div></section>
-  <p class="disc">Compliscope only makes passive checks, the same things any visitor’s browser sees. It never probes servers or tests for break-ins. For deeper testing, get written permission from the site owner and use a qualified professional. Not legal advice.</p>`;
+  <p class="disc">Compliscope checks what any visitor’s browser sees, and re-requests the page once for its headers. It never probes servers or tests for break-ins, and it sends nothing anywhere except the site being audited. For deeper testing, get written permission from the site owner and use a qualified professional. Not legal advice.</p>`;
 }
 route();

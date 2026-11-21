@@ -16,7 +16,7 @@
     ["criteo.com", "Criteo", "Criteo", "ads", "FR"], ["criteo.net", "Criteo", "Criteo", "ads", "FR"], ["taboola.com", "Taboola", "Taboola", "ads", "US/IL"], ["outbrain.com", "Outbrain", "Outbrain", "ads", "US/IL"],
     ["adnxs.com", "Xandr (AppNexus)", "Microsoft", "ads", "US"], ["rubiconproject.com", "Magnite", "Magnite", "ads", "US"], ["pubmatic.com", "PubMatic", "PubMatic", "ads", "US"], ["amazon-adsystem.com", "Amazon Ads", "Amazon", "ads", "US"],
     ["hubspot.com", "HubSpot", "HubSpot", "analytics", "US"], ["hs-scripts.com", "HubSpot", "HubSpot", "analytics", "US"], ["hs-analytics.net", "HubSpot Analytics", "HubSpot", "analytics", "US"],
-    ["youtube.com", "YouTube embed", "Google", "embed", "US"], ["youtube-nocookie.com", "YouTube (privacy-enhanced mode)", "Google", "embed", "US"], ["ytimg.com", "YouTube", "Google", "embed", "US"],
+    ["youtube.com", "YouTube embed", "Google", "embed", "US"], ["youtube-nocookie.com", "YouTube (privacy-enhanced mode)", "Google", "embed", "US"], ["ytimg.com", "YouTube thumbnails", "Google", "cdn", "US"],
     ["player.vimeo.com", "Vimeo embed", "Vimeo", "embed", "US"], ["maps.googleapis.com", "Google Maps", "Google", "embed", "US"], ["maps.google.com", "Google Maps", "Google", "embed", "US"],
     ["platform.twitter.com", "X (Twitter) embed", "X Corp", "social", "US"], ["platform.instagram.com", "Instagram embed", "Meta", "social", "US"], ["disqus.com", "Disqus", "Disqus", "social", "US"],
     ["fonts.googleapis.com", "Google Fonts", "Google", "fonts", "US"], ["fonts.gstatic.com", "Google Fonts", "Google", "fonts", "US"], ["use.typekit.net", "Adobe Fonts", "Adobe", "fonts", "US"],
@@ -32,7 +32,10 @@
     ["osano.com", "Osano", "Osano", "consent", "US"], ["iubenda.com", "iubenda", "iubenda", "consent", "IT"],
   ];
   const TRACKING = new Set(["analytics", "ads", "session", "social", "tag"]);
-  function match(url) { let h; try { const u = new URL(url); h = u.hostname + u.pathname; } catch { return null; } for (const [d, name, company, cat, country] of T) { if (h.includes(d)) return { domain: d, name, company, cat, country, tracking: TRACKING.has(cat) }; } return null; }
+  // Longest pattern first: "hubspot.com/conversations" (chat) must win over
+  // "hubspot.com" (analytics), and "youtube-nocookie.com" over "youtube.com".
+  const TS = [...T].sort((a, b) => b[0].length - a[0].length);
+  function match(url) { let h; try { const u = new URL(url); h = u.hostname + u.pathname; } catch { return null; } for (const [d, name, company, cat, country] of TS) { if (h.includes(d)) return { domain: d, name, company, cat, country, tracking: TRACKING.has(cat) }; } return null; }
   const CMP = [[/onetrust|optanon/i, "OneTrust"], [/cookiebot|CybotCookiebot/i, "Cookiebot"], [/usercentrics|uc-banner/i, "Usercentrics"], [/didomi/i, "Didomi"], [/qc-cmp|quantcast/i, "Quantcast Choice"], [/truste|trustarc/i, "TrustArc"], [/osano/i, "Osano"], [/cky-consent|cookieyes/i, "CookieYes"], [/cmplz|complianz/i, "Complianz"], [/iubenda/i, "iubenda"], [/termly/i, "Termly"], [/cookie-?law-?info|cli_/i, "CookieLawInfo"], [/borlabs/i, "Borlabs"], [/klaro/i, "Klaro"]];
   globalThis.COMPLISCOPE_TRACKERS = { list: T, match, CMP, TRACKING };
 })();

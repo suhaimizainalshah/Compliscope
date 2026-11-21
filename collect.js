@@ -4,7 +4,13 @@
 (async () => {
   const TR = globalThis.COMPLISCOPE_TRACKERS;
   const here = location.hostname.replace(/^www\./, "");
-  const sameSite = h => { const a = h.replace(/^www\./, "").split("."), b = here.split("."); return a.slice(-2).join(".") === b.slice(-2).join("."); };
+  const sameSite = h => regDomain(h) === regDomain(here);
+  // Registrable domain: "evil.co.uk" and "bank.co.uk" are different sites,
+  // as are "a.github.io" and "b.github.io". A small public-suffix list
+  // covers the common two-level cases; everything else compares the last
+  // two labels.
+  const TWO_LEVEL = new Set(["co.uk", "org.uk", "ac.uk", "gov.uk", "com.au", "net.au", "org.au", "co.jp", "co.kr", "com.br", "com.sg", "com.hk", "co.nz", "com.mx", "github.io", "gitlab.io", "netlify.app", "vercel.app", "herokuapp.com", "s3.amazonaws.com"]);
+  const regDomain = h => { const p = h.replace(/^www\./, "").split("."); if (p.length <= 2) return p.join("."); const last2 = p.slice(-2).join("."); return TWO_LEVEL.has(last2) ? p.slice(-3).join(".") : last2; };
   const vis = e => { if (!e) return false; const r = e.getBoundingClientRect(), cs = getComputedStyle(e); return r.width > 4 && r.height > 4 && cs.visibility !== "hidden" && cs.display !== "none" && +cs.opacity > .05; };
   const txt = e => (e?.innerText || e?.textContent || "").replace(/\s+/g, " ").trim();
   const abs = u => { try { return new URL(u, location.href).href; } catch { return ""; } };
@@ -24,8 +30,17 @@
   const COOKIE_WORDS = /\b(cookies?|consent|tracking|personal data|privacy|gdpr|pdpa|datenschutz|kuki|persetujuan)\b/i;
   const cands = [...document.querySelectorAll("body *")].filter(e => {
     if (e.children.length > 80) return false; const s = (e.id + " " + e.className).toString();
-    const cs = getComputedStyle(e); const floaty = cs.position === "fixed" || cs.position === "sticky" || e.getAttribute("role") === "dialog" || e.getAttribute("aria-modal") === "true" || e.tagName === "DIALOG";
-    return (floaty || /cookie|consent|gdpr|cmp|onetrust|cookiebot|usercentrics|didomi|privacy-banner|cc-window|cky-|cmplz/i.test(s)) && vis(e) && COOKIE_WORDS.test(txt(e).slice(0, 1500)) && txt(e).length < 4000;
+    // Cheap tests first: only elements whose id/class or role looks like a
+    // consent banner get a style read. getComputedStyle on every element
+    // of a large page forces layout thousands of times.
+    const named = /cookie|consent|gdpr|cmp|onetrust|cookiebot|usercentrics|didomi|privacy-banner|cc-window|cky-|cmplz/i.test(s);
+    const dialog = e.tagName === "DIALOG" || e.getAttribute("role") === "dialog" || e.getAttribute("aria-modal") === "true";
+    if (!named && !dialog) return false;
+    const cs = getComputedStyle(e); const floaty = cs.position === "fixed" || cs.position === "sticky" || dialog;
+    if (!floaty && !named) return false;
+    if (!vis(e)) return false;
+    const t = txt(e);
+    return COOKIE_WORDS.test(t.slice(0, 1500)) && t.length < 4000;
   });
   let banner = cands.sort((a, b) => txt(a).length - txt(b).length).find(e => e.querySelector("button,a,[role=button],input[type=button],input[type=submit]"));
   if (banner) { let p = banner; while (p.parentElement && p.parentElement !== document.body && txt(p.parentElement).length < 4000 && vis(p.parentElement) && p.parentElement.querySelectorAll("button,a").length < 25) p = p.parentElement; banner = p; }
@@ -70,7 +85,7 @@
 
   /* personal data sent to third parties in addresses */
   D.piiInUrls = [];
-  for (const r of D.resources) { const h = hostOf(r.url); if (!h || sameSite(h)) continue; let u; try { u = new URL(r.url); } catch { continue; } const q = decodeURIComponent(u.search + u.hash);
+  for (const r of D.resources) { const h = hostOf(r.url); if (!h || sameSite(h)) continue; let u; try { u = new URL(r.url); } catch { continue; } let q; try { q = decodeURIComponent(u.search + u.hash); } catch { continue; }
     if (/[\w.+-]+@[\w-]+\.[a-z]{2,}/i.test(q) || [...u.searchParams.keys()].some(k => /^(e?mail|email_address|phone|tel|first_?name|last_?name|fullname|ic|nric|dob)$/i.test(k))) D.piiInUrls.push({ host: h, sample: r.url.replace(/([\w.+-]+)@([\w-]+\.[a-z.]{2,})/gi, "•••@$2").slice(0, 160) }); if (D.piiInUrls.length > 10) break; }
 
   /* response headers and security.txt (same-site, public) */
@@ -99,12 +114,12 @@
   D.aiCalls = tp.filter(t => t.cat === "ai").map(t => t.name);
   D.aiMentions = (bodyText.match(/\b(artificial intelligence|ai-generated|generated (by|with) ai|ai-powered|machine learning|chatbot)\b/gi) || []).length;
   const sentences = bodyText.split(/(?<=[.!?])\s+|\n+/).filter(s => s.length > 20 && s.length < 400).slice(0, 4000);
-  const AI_IN = /\b(ai|artificial intelligence|automated|algorithm|machine learning|predictive|scoring model|chatgpt|gpt)\b/i;
+  const AI_IN = /\b(ai|artificial intelligence|automated|machine learning|predictive|scoring model|chatgpt|gpt)\b/i;
   const AREAS = [["education", /\b(admission|admissions|applicants?|students?|exams?|grading|marking|assessment|proctor\w*|enrol\w*|learning outcomes)\b/i], ["employment", /\b(recruit\w*|hiring|job applications?|candidates?|cvs?|résumés?|resumes?|interview|volunteer applications?|shortlist\w*)\b/i], ["essential services", /\b(loans?|credit|eligibility|benefits?|welfare|grant applications?|insurance|housing allocation)\b/i]];
   D.highRisk = []; for (const [area, re] of AREAS) { const hit = sentences.find(s => AI_IN.test(s) && re.test(s)); if (hit) D.highRisk.push({ area, evidence: hit.slice(0, 220) }); }
   D.prohibited = sentences.filter(s => /\b(emotion (recognition|detection|analysis|ai)|detect\w* (the )?emotions?|facial expression analysis|mood detection)\b/i.test(s) && /\b(students?|pupils?|employees?|staff|workers?|classroom|workplace)\b/i.test(s)).slice(0, 2).map(s => s.slice(0, 220));
   D.biometric = sentences.filter(s => /\b(facial recognition|face recognition|biometric)\b/i.test(s)).slice(0, 2).map(s => s.slice(0, 220));
-  D.children = /\b(school|students|pupils|kids|children|child|parents?|kindergarten|preschool|nursery|primary|secondary|under 1[3-8]|youth|sekolah|anak|murid)\b/i.test(document.title + " " + bodyText.slice(0, 20000)) ? (bodyText.slice(0, 20000).match(/\b(school|students|pupils|kids|children|parents|kindergarten|preschool|youth)\b/gi) || []).length : 0;
+  D.children = /\b(school|pupils|kids|children|child|kindergarten|preschool|nursery|primary|secondary|under 1[3-8]|youth|sekolah|anak|murid)\b/i.test(document.title + " " + bodyText.slice(0, 20000)) ? (bodyText.slice(0, 20000).match(/\b(school|pupils|kids|children|kindergarten|preschool|youth)\b/gi) || []).length : 0;
   D.aiImagesLabelled = /\b(ai-generated|generated (with|by) ai|image (created|made) (with|using) ai|synthetic (image|media))\b/i.test(bodyText);
   D.charity = /\b(charity|non-?profit|not-for-profit|ngo|foundation|donat\w+|volunteer|registered charity|social enterprise|yayasan)\b/i.test(document.title + " " + bodyText.slice(0, 15000));
   D.cookiesJs = document.cookie ? document.cookie.split(";").map(c => c.split("=")[0].trim()).filter(Boolean) : [];

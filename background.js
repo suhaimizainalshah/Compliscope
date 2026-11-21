@@ -11,6 +11,7 @@ function probe() {
     chatGlobals: [["Intercom", window.Intercom], ["Drift", window.drift], ["Zendesk", window.zE], ["Tidio", window.tidioChatApi], ["Crisp", window.$crisp], ["tawk.to", window.Tawk_API], ["HubSpot Chat", window.HubSpotConversations]].filter(x => x[1]).map(x => x[0]) };
 }
 const URL_LIBS = [[/jquery[.-](\d+\.\d+\.\d+)/i, "jQuery"], [/jquery@(\d+\.\d+\.\d+)/i, "jQuery"], [/jquery-ui[.-](\d+\.\d+\.\d+)/i, "jQuery UI"], [/bootstrap[@/.-](\d+\.\d+\.\d+)/i, "Bootstrap"], [/angular(?:js)?[@/.-](1\.\d+\.\d+)/i, "AngularJS"], [/lodash[@/.-](\d+\.\d+\.\d+)/i, "Lodash"], [/moment[@/.-](\d+\.\d+\.\d+)/i, "Moment.js"], [/handlebars[@/.-](\d+\.\d+\.\d+)/i, "Handlebars"], [/underscore[@/.-](\d+\.\d+\.\d+)/i, "Underscore"]];
+let lastId = 0;
 async function audit(tab, mode = "current") {
   if (!/^https?:/.test(tab?.url || "")) throw new Error("Compliscope can only audit websites (http or https pages).");
   const [{ result: data }] = await chrome.scripting.executeScript({ target: { tabId: tab.id }, files: ["trackers.js", "collect.js"] });
@@ -18,11 +19,12 @@ async function audit(tab, mode = "current") {
   try { const [{ result: p }] = await chrome.scripting.executeScript({ target: { tabId: tab.id }, world: "MAIN", func: probe }); data.libs = p.libs; data.tcf = p.tcf; data.gpp = p.gpp; if (p.chatGlobals.length) data.chat = [...new Set([...(data.chat || []).filter(c => c !== "Chat widget"), ...p.chatGlobals])]; } catch { data.libs = []; }
   for (const r of data.resources) for (const [re, name] of URL_LIBS) { const m = r.url.match(re); if (m && !data.libs.some(l => l.name === name)) data.libs.push({ name, version: m[1], fromUrl: true }); }
   try { data.cookies = (await chrome.cookies.getAll({ url: tab.url })).map(c => ({ name: c.name, domain: c.domain, secure: c.secure, httpOnly: c.httpOnly, sameSite: c.sameSite, session: c.session, expires: c.expirationDate || 0 })); data.cookieSource = "browser"; }
-  catch { data.cookies = (data.cookiesJs || []).map(n => ({ name: n, domain: data.host, secure: true, httpOnly: false, sameSite: "unspecified", session: false })); data.cookieSource = "page"; }
-  data.resources = data.resources.slice(0, 600); data.mode = mode; data.tabId = tab.id; data.id = Date.now();
+  catch { data.cookies = (data.cookiesJs || []).map(n => ({ name: n, domain: data.host, secure: null, httpOnly: null, sameSite: "unspecified", session: false })); data.cookieSource = "page"; }
+  data.resources = data.resources.slice(0, 600); data.mode = mode; data.tabId = tab.id; data.id = Math.max(Date.now(), lastId + 1); lastId = data.id;
   const { audits = {} } = await chrome.storage.local.get("audits"); audits[data.id] = data;
   const keys = Object.keys(audits).sort(); keys.slice(0, Math.max(0, keys.length - 25)).forEach(k => delete audits[k]);
-  await chrome.storage.local.set({ audits });
+  try { await chrome.storage.local.set({ audits }); }
+  catch { const k2 = Object.keys(audits).sort(); k2.slice(0, Math.max(0, k2.length - 10)).forEach(k => delete audits[k]); await chrome.storage.local.set({ audits }); }
   return data.id;
 }
 const waitLoad = tabId => new Promise(res => { const f = (id, info) => { if (id === tabId && info.status === "complete") { chrome.tabs.onUpdated.removeListener(f); setTimeout(res, 4000); } }; chrome.tabs.onUpdated.addListener(f); setTimeout(() => { chrome.tabs.onUpdated.removeListener(f); res(); }, 30000); });
@@ -41,7 +43,7 @@ chrome.runtime.onMessage.addListener((m, _s, reply) => {
 });
 chrome.runtime.onInstalled.addListener(async ({ reason }) => {
   const { jurisdictions } = await chrome.storage.sync.get("jurisdictions"); if (!jurisdictions) chrome.storage.sync.set({ jurisdictions: ["EU_GDPR", "EU_AIACT"] });
-  chrome.contextMenus.create({ id: "audit", title: "Audit this site with Compliscope", contexts: ["page"] });
+  chrome.contextMenus.removeAll(() => { chrome.contextMenus.create({ id: "audit", title: "Audit this site with Compliscope", contexts: ["page"] }); });
   if (reason === "install") chrome.tabs.create({ url: "app.html#welcome" });
 });
 chrome.contextMenus.onClicked.addListener(async (_i, tab) => { try { const id = await audit(tab); chrome.tabs.create({ url: `app.html#audit=${id}`, index: tab.index + 1 }); } catch {} });

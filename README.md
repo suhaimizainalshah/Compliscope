@@ -4,6 +4,8 @@
 
 Compliscope looks at what a website does in your browser, explains problems in plain language, shows **which sections of which laws** each problem may contravene, and says how to fix it. Everything runs on your device.
 
+Made by [Compliscope Advisory](https://suhaimizainalshah.github.io/Compliscope-Advisory/) — independent AI compliance and governance support for the EU, Vietnam, South Korea and ASEAN.
+
 ## What it checks
 
 ### Privacy and cookies
@@ -35,7 +37,7 @@ Clears only that site’s cookies and storage in your browser, reloads it, and a
 Grade (A to F) and score, findings grouped by Privacy, AI Act and Security, filters, a third-party and cookie list, and export to **PDF**, JSON or CSV.
 
 ## AI and data security atlas
-A detailed, dated guide (last checked 19 November 2026) to how AI and data are regulated in **ASEAN, Singapore, Malaysia, Indonesia, Vietnam, Thailand, the Philippines, India, Pakistan, China and the United States**:
+A detailed, dated guide (last checked 21 November 2026) to how AI and data are regulated in **ASEAN, Singapore, Malaysia, Indonesia, Vietnam, Thailand, the Philippines, India, Pakistan, China, South Korea and the United States**:
 - an at-a-glance comparison: AI law status, AI content labelling, chatbot disclosure, breach notification deadlines, DPO requirements and data localisation;
 - for each country, a timeline, the AI rules and the data protection and security rules, each marked **Binding**, **Voluntary**, **Draft** or **Policy**, with what they require;
 - what each country’s rules mean for your website and organisation, links to official sources, and one click to include that country in website audits.
@@ -61,7 +63,7 @@ It only makes **passive** checks: it reads what any visitor’s browser receives
 Works in Chrome 116 or later and other Chromium browsers. Shortcuts: **Alt+Shift+K** opens Compliscope, **Alt+Shift+U** audits the current site.
 
 ## Publish on the Chrome Web Store
-Upload `compliscope-extension.zip`, copy the text from `store/STORE_LISTING.md`, add the screenshots in `store/`, and use `https://github.com/suhaimizainalshah/Compliscope/blob/main/PRIVACY.md` as the privacy policy URL.
+Zip the extension files into `compliscope-extension.zip` and upload it, copy the text from `store/STORE_LISTING.md`, add the screenshots in `store/`, and use `https://github.com/suhaimizainalshah/Compliscope/blob/main/PRIVACY.md` as the privacy policy URL.
 
 ## Files
 ```

@@ -1,8 +1,8 @@
 /* Compliscope atlas: AI governance and data security rules by country.
-   Last checked: 19 November 2026. Laws change quickly; always check the official sources listed.
+   Last checked: 21 November 2026. Laws change quickly; always check the official sources listed.
    type: Binding (law in force), Voluntary (guidance), Draft (proposed), Policy (strategy, not law). */
 (() => {
-  const CHECKED = "19 November 2026";
+  const CHECKED = "21 November 2026";
   const A = [
     {
       id: "ASEAN", name: "ASEAN (regional)", region: "Southeast Asia", status: "guidance", statusText: "Voluntary regional guidance",
@@ -116,34 +116,36 @@
       sources: [["ETDA", "https://www.etda.or.th/"], ["PDPC Thailand", "https://www.pdpc.or.th/"]],
     },
     {
-      id: "PH", name: "Philippines", region: "Southeast Asia", status: "draft", statusText: "AI bills in Congress; data privacy guidance applies to AI",
-      summary: "The Philippines has a national AI roadmap and AI bills pending in Congress. The Data Privacy Act and the regulator’s guidance already apply to AI that uses personal data.",
-      timeline: [["2012", "Data Privacy Act and Cybercrime Prevention Act"], ["2024", "National AI Strategy Roadmap 2.0"], ["Dec 2024", "NPC advisory on applying the Data Privacy Act to AI systems"], ["2026", "Consolidated AI bill pending in Congress"]],
+      id: "PH", name: "Philippines", region: "Southeast Asia", status: "patchwork", statusText: "Executive Order 131 creates a national AI framework; no AI statute yet",
+      summary: "The Philippines has a national AI roadmap and AI bills pending in Congress. Executive Order 131 (November 2026) adopts a national AI Governance Framework and creates a National AI Council. The Data Privacy Act and the regulator’s guidance already apply to AI that uses personal data.",
+      timeline: [["2012", "Data Privacy Act and Cybercrime Prevention Act"], ["2024", "National AI Strategy Roadmap 2.0"], ["Dec 2024", "NPC advisory on applying the Data Privacy Act to AI systems"], ["11 Aug 2026", "NPC notice on AI likenesses under the Data Privacy Act"], ["12 Nov 2026", "Executive Order 131: national AI Governance Framework and National AI Council"]],
       ai: [
+        { name: "Executive Order 131 — AI Governance Framework", type: "Binding", date: "Signed 12 Nov 2026, effective 14 Nov 2026", what: "Adopts a national AI Governance Framework and creates a National AI Council." },
         { name: "National AI Strategy Roadmap 2.0", type: "Policy", date: "2024", what: "National direction for AI adoption and research." },
         { name: "NPC advisory on AI systems processing personal data", type: "Voluntary", date: "Dec 2024", what: "How the Data Privacy Act’s transparency, accountability and fairness duties apply to AI." },
         { name: "AI bills (consolidated)", type: "Draft", date: "Pending in Congress", what: "Proposed AI development and regulation framework. Not law yet." },
       ],
       data: [
         { name: "Data Privacy Act 2012 (RA 10173)", type: "Binding", date: "In force", what: "Lawful processing, sensitive personal information, rights of data subjects and security duties." },
+        { name: "NPC notice on AI likenesses", type: "Guidance", date: "11 Aug 2026", what: "Real persons’ likenesses in AI images are personal information under RA 10173; fabricated images are false personal data (DPA s16(e))." },
         { name: "Breach notification (NPC Circular 16-03)", type: "Binding", date: "In force", what: "Notify the NPC and affected people within 72 hours of knowing about a breach involving sensitive data that’s likely to cause harm." },
         { name: "Cybercrime Prevention Act 2012 (RA 10175)", type: "Binding", date: "In force", what: "Offences for illegal access, interception, data interference and more." },
       ],
-      cmp: { ai: "Bills pending", labels: "Not yet required", chatbot: "Recommended (NPC)", breach: "72 hours", dpo: "Required (register with NPC)", local: "No general rule" },
+      cmp: { ai: "EO 131 framework; bills pending", labels: "Not yet required", chatbot: "Recommended (NPC)", breach: "72 hours", dpo: "Required (register with NPC)", local: "No general rule" },
       website: ["Designate a data protection officer and register with the NPC where required.", "Apply the NPC’s AI advisory: explain AI use, avoid unfair outcomes and keep humans accountable."],
       sources: [["National Privacy Commission", "https://privacy.gov.ph/"]],
     },
     {
       id: "IN", name: "India", region: "South Asia", status: "patchwork", statusText: "No AI Act; binding deepfake labelling rules and a phased data law",
       summary: "India has chosen not to pass a standalone AI Act for now. It governs AI through guidelines, binding IT Rules on synthetic content, and the DPDP Act, whose core duties start in May 2027.",
-      timeline: [["Apr 2022", "CERT-In directions: report cyber incidents within 6 hours"], ["Aug 2023", "DPDP Act passed"], ["5 Nov 2025", "India AI Governance Guidelines released"], ["14 Nov 2025", "DPDP Rules notified; phased commencement"], ["20 Feb 2026", "IT Rules amendment on synthetically generated information in force"], ["Nov 2026", "Consent Manager phase begins"], ["14 May 2027", "Core DPDP duties apply"]],
+      timeline: [["Apr 2022", "CERT-In directions: report cyber incidents within 6 hours"], ["Aug 2023", "DPDP Act passed"], ["5 Nov 2025", "India AI Governance Guidelines released"], ["13 Nov 2025", "DPDP Rules notified (Gazette G.S.R. 846(E)); phased commencement"], ["20 Feb 2026", "IT Rules amendment on synthetically generated information in force"], ["13 Nov 2026", "Consent Manager registration begins"], ["13 May 2027", "Core DPDP duties apply"]],
       ai: [
         { name: "India AI Governance Guidelines (MeitY)", type: "Voluntary", date: "5 Nov 2025", what: "Seven principles (‘sutras’), proposed institutions such as an AI Governance Group and an AI Safety Institute, and reliance on existing laws rather than a standalone AI Act." },
         { name: "IT (Intermediary Guidelines) Amendment Rules, 2026", type: "Binding", date: "In force 20 Feb 2026", what: "Defines synthetically generated information; platforms that enable it must label it prominently and attach metadata; very short removal deadlines for unlawful deepfakes." },
         { name: "Further amendment on continuous labels and provenance", type: "Draft", date: "Consulted Mar–May 2026", what: "Proposed stronger, continuous labelling and permanent provenance metadata." },
       ],
       data: [
-        { name: "Digital Personal Data Protection Act 2023 and DPDP Rules 2025", type: "Binding (phased)", date: "Core duties from 14 May 2027", what: "Notice and consent, security safeguards, breach notification, children’s data (verifiable parental consent, no tracking or targeted ads at children) and a Data Protection Board." },
+        { name: "Digital Personal Data Protection Act 2023 and DPDP Rules 2025", type: "Binding (phased)", date: "Core duties from 13 May 2027", what: "Notice and consent, security safeguards, breach notification, children’s data (verifiable parental consent, no tracking or targeted ads at children) and a Data Protection Board." },
         { name: "CERT-In Directions (IT Act s70B)", type: "Binding", date: "Apr 2022", what: "Report specified cyber incidents to CERT-In within 6 hours and keep logs for 180 days." },
         { name: "Information Technology Act 2000", type: "Binding", date: "In force", what: "Cyber offences and duties for intermediaries." },
       ],
@@ -185,6 +187,23 @@
       cmp: { ai: "Targeted binding rules", labels: "Required (visible and metadata)", chatbot: "Required for some services", breach: "Required (prompt reporting)", dpo: "Required above thresholds", local: "Yes, for important data and some operators" },
       website: ["If your content reaches people in mainland China, label AI-generated text, images, audio and video, visibly and in metadata.", "Check cross-border transfer rules before moving personal information out of China."],
       sources: [["Cyberspace Administration of China", "https://www.cac.gov.cn/"]],
+    },
+    {
+      id: "KR", name: "South Korea", region: "East Asia", status: "binding", statusText: "Binding AI Basic Act in force since 22 January 2026; MSIT grace period on fines",
+      summary: "South Korea has a dedicated AI statute. The AI Basic Act requires transparency for high-impact and generative AI, risk management for high-impact systems, and labelling of AI-generated output. The Personal Information Protection Act (PIPA) governs personal data. MSIT is deferring fines and fact-finding for at least one year except in serious cases.",
+      timeline: [["26 Dec 2024", "AI Basic Act passed by the National Assembly"], ["22 Jan 2026", "AI Basic Act and Enforcement Decree in force; five MSIT guidelines issued"], ["11 Sep 2026", "PIPA amended (higher surcharges)"]],
+      ai: [
+        { name: "AI Basic Act (Framework Act on AI)", type: "Binding", date: "In force 22 Jan 2026", what: "Transparency, safety and high-impact AI duties; domestic representative for overseas operators above the thresholds; fines up to KRW 30 million." },
+        { name: "MSIT AI Basic Act guidelines", type: "Guidance", date: "Jan 2026", what: "Five guidelines on transparency, safety assurance for high-performance AI, high-impact AI confirmation, business operators' responsibilities and AI impact assessment." },
+        { name: "Deepfake offences (sexual crimes and elections)", type: "Binding", date: "In force", what: "Criminal offences for non-consensual deepfakes, including under the Act on Special Cases Concerning the Punishment of Sexual Crimes and election law." },
+      ],
+      data: [
+        { name: "Personal Information Protection Act (PIPA)", type: "Binding", date: "In force; amended 11 Sep 2026", what: "Consent, purpose limitation, security measures, breach notification and cross-border transfer rules; surcharges up to 10% of revenue." },
+        { name: "PIPC generative AI guidance", type: "Guidance", date: "In force", what: "How PIPA applies to generative AI and personal information." },
+      ],
+      cmp: { ai: "AI Basic Act", labels: "Required (AI output)", chatbot: "Required (tell users first)", breach: "Notify PIPC and people", dpo: "Required in many cases", local: "Domestic representative" },
+      website: ["Tell users in advance when a product or service uses generative or high-impact AI, and label AI-generated output.", "Check whether your system is high-impact AI in one of the ten listed areas, and plan risk management and human oversight."],
+      sources: [["MSIT (English)", "https://www.msit.go.kr/eng/index.do"], ["AI Regulation Map — South Korea", "https://www.airegulationmap.org/country/south-korea/"]],
     },
     {
       id: "US", name: "United States", region: "Americas", status: "patchwork", statusText: "No federal AI Act; federal policy plus a growing state patchwork",

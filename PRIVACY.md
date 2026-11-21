@@ -5,7 +5,7 @@
 Compliscope runs **on your own device**. It does not collect, sell or send the pages you audit, your results, your readiness plan, your browsing history or any personal information to anyone. There are no accounts, analytics, trackers or external servers.
 
 ## What Compliscope reads
-Only when you ask it to audit a page (by clicking the button, using a shortcut or the right-click menu), Compliscope reads what any visitor’s browser already receives from that page: its content, the files it has loaded, its readable cookies, its own response headers and its public `/.well-known/security.txt` file. It does not submit forms, probe servers or test for weaknesses.
+Only when you ask it to audit a page (by clicking the button, using a shortcut or the right-click menu), Compliscope reads what any visitor’s browser already receives from that page: its content, the files it has loaded, its readable cookies, its own response headers and its public `/.well-known/security.txt` file. To check the headers it re-requests the page once, and for the secrets check it fetches a few of the site’s own scripts — all of these requests go to the site being audited, and nothing is sent anywhere else. Audit results can include the page’s public email addresses and form field names. It does not submit forms, probe servers or test for weaknesses.
 
 ## What is stored, and where
 - **Audit results** (the last 25) are stored in your browser’s local extension storage.
