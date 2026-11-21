@@ -1,13 +1,13 @@
-# Chrome Web Store listing for Compliscope
+# Chrome Web Store listing for AI Benar
 
 ## Name
-Compliscope: Privacy, AI Law and Security Checker
+AI Benar: Privacy, AI Law and Security Checker
 
 ## Summary (132 characters max)
 Check websites for GDPR, EU AI Act and Asian and US AI and data laws, with plain fixes, an AI law atlas and a plan for non-profits.
 
 ## Description
-Compliscope checks what a website does in your browser and explains, in plain language, what may break privacy, AI and security rules, and how to fix it.
+AI Benar checks what a website does in your browser and explains, in plain language, what may break privacy, AI and security rules, and how to fix it.
 
 PRIVACY AND COOKIES
 • Tracking that starts before visitors agree, consent banners without a Reject button, pre-ticked boxes
@@ -36,7 +36,7 @@ READINESS NAVIGATOR
 
 Passive checks only, all on your device. Not legal advice.
 
-Need a hand acting on what Compliscope finds? Compliscope Advisory (https://suhaimizainalshah.github.io/Compliscope-Advisory/) offers independent AI compliance and governance support.
+Need a hand acting on what AI Benar finds? AI Benar Advisory (https://suhaimizainalshah.github.io/Compliscope-Advisory/) offers independent AI compliance and governance support.
 
 ## Category
 Productivity (or Developer Tools)

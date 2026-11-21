@@ -1,4 +1,4 @@
-/* Compliscope: known third-party services, matched by domain.
+/* AI Benar: known third-party services, matched by domain.
    cat: analytics, ads, social, session (records visits), embed, fonts, cdn, chat, ai, consent, tag (tag manager) */
 (() => {
   const T = [

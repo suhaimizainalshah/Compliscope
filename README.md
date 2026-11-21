@@ -1,10 +1,10 @@
-# Compliscope
+# AI Benar
 
 **A passive privacy, EU AI Act and security checker for any website, plus a readiness navigator for schools, charities, NGOs and non-profits.**
 
-Compliscope looks at what a website does in your browser, explains problems in plain language, shows **which sections of which laws** each problem may contravene, and says how to fix it. Everything runs on your device.
+AI Benar looks at what a website does in your browser, explains problems in plain language, shows **which sections of which laws** each problem may contravene, and says how to fix it. Everything runs on your device.
 
-Made by [Compliscope Advisory](https://suhaimizainalshah.github.io/Compliscope-Advisory/) — independent AI compliance and governance support for the EU, Vietnam, South Korea and ASEAN.
+Made by [AI Benar Advisory](https://suhaimizainalshah.github.io/Compliscope-Advisory/) — independent AI compliance and governance support for the EU, Vietnam, South Korea and ASEAN.
 
 ## What it checks
 
@@ -52,18 +52,18 @@ A plain-language plan for schools, charities, NGOs and non-profits working acros
 - starter templates: an AI use policy, chatbot disclosure, AI image label, photo and story consent wording, and data breach first steps;
 - export to PDF or JSON.
 
-## What Compliscope will not do
+## What AI Benar will not do
 It only makes **passive** checks: it reads what any visitor’s browser receives. It never probes servers, submits forms, guesses passwords or tests for break-ins. Testing a site’s defences needs the owner’s written permission and a qualified professional. Results are indicative and **not legal advice**.
 
 ## Install for testing
 1. Open `chrome://extensions` and turn on **Developer mode**.
 2. Click **Load unpacked** and choose this folder.
-3. Pin Compliscope, open a website and click **Audit this site**.
+3. Pin AI Benar, open a website and click **Audit this site**.
 
-Works in Chrome 116 or later and other Chromium browsers. Shortcuts: **Alt+Shift+K** opens Compliscope, **Alt+Shift+U** audits the current site.
+Works in Chrome 116 or later and other Chromium browsers. Shortcuts: **Alt+Shift+K** opens AI Benar, **Alt+Shift+U** audits the current site.
 
 ## Publish on the Chrome Web Store
-Zip the extension files into `compliscope-extension.zip` and upload it, copy the text from `store/STORE_LISTING.md`, add the screenshots in `store/`, and use `https://github.com/suhaimizainalshah/Compliscope/blob/main/PRIVACY.md` as the privacy policy URL.
+Zip the extension files into `ai-benar-extension.zip` and upload it, copy the text from `store/STORE_LISTING.md`, add the screenshots in `store/`, and use `https://github.com/suhaimizainalshah/Compliscope/blob/main/PRIVACY.md` as the privacy policy URL.
 
 ## Files
 ```

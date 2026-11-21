@@ -1,4 +1,4 @@
-/* Compliscope rules: turn what the collector saw into findings, each tied to topics that the law
+/* AI Benar rules: turn what the collector saw into findings, each tied to topics that the law
    catalogue maps to specific sections in each jurisdiction you choose. */
 (() => {
   const VULN = [
@@ -29,7 +29,7 @@
       else add({ id: "trackers-present", cat: "privacy", status: d.banner?.present ? "info" : "warn", severity: "medium", title: d.banner?.present ? "Tracking tools in use" : "Tracking tools in use without a visible consent choice", confidence: "medium",
         found: list(trackers.map(t => `${t.name} (${t.company}, ${t.cat})`)), why: "It’s not possible to tell from this visit whether consent was given earlier.",
         fix: "Click “Re-test as a new visitor” to clear this site’s cookies and check what loads before any choice is made.", topics: ["consent_cookies"] });
-    } else add({ id: "trackers-none", cat: "privacy", status: "pass", severity: "low", title: "No known tracking tools loaded", found: ["No analytics, advertising or session-recording services from Compliscope’s list were seen on this page."], topics: [] });
+    } else add({ id: "trackers-none", cat: "privacy", status: "pass", severity: "low", title: "No known tracking tools loaded", found: ["No analytics, advertising or session-recording services from AI Benar’s list were seen on this page."], topics: [] });
     if (session.length) add({ id: "session-recording", cat: "privacy", status: bannerShowing || firstVisit ? "fail" : "warn", severity: "high", title: "Session recording captures what visitors do", found: list(session.map(t => `${t.name} (${t.company})`)),
       why: "Session-replay tools can record clicks, scrolling and sometimes typed text, including personal data. They need consent and careful masking.", fix: "Only load them after consent, mask all form fields and personal text, and mention them in your privacy notice.", topics: ["consent_cookies", "minimisation"] });
     if (!d.banner?.present && (trackers.length || trackingCookies.length)) add({ id: "no-banner", cat: "privacy", status: "fail", severity: "high", title: "No consent banner found", found: ["Tracking was found, but no cookie or consent banner, and no consent platform."], why: "Visitors have no way to say yes or no to tracking.", fix: "Add a consent tool that blocks non-essential cookies until visitors choose, with Accept and Reject on the first screen.", topics: ["consent_cookies", "transparency"] });

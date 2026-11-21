@@ -1,4 +1,4 @@
-/* Compliscope app: audit report, law selection, history and welcome. The navigator lives in navigator.js. */
+/* AI Benar app: audit report, law selection, history and welcome. The navigator lives in navigator.js. */
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
 const { LAWS, DEFAULT } = globalThis.COMPLISCOPE_LAWS, R = globalThis.COMPLISCOPE_RULES;
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -29,7 +29,7 @@ let filter = "problems";
 async function renderAudit(v, id) {
   const audits = await getAudits(); if (!id) id = Object.keys(audits).sort().pop();
   const d = audits[id];
-  if (!d) { v.innerHTML = `<div class="empty card"><h1>No audit yet</h1><p class="muted">Open any website, click the Compliscope icon and choose “Audit this site”.</p></div>`; return; }
+  if (!d) { v.innerHTML = `<div class="empty card"><h1>No audit yet</h1><p class="muted">Open any website, click the AI Benar icon and choose “Audit this site”.</p></div>`; return; }
   const J = await getJ(), F = R.audit(d, J), S = R.score(F);
   const order = { fail: 0, warn: 1, info: 2, pass: 3 }, sev = { high: 0, medium: 1, low: 2 };
   F.sort((a, b) => order[a.status] - order[b.status] || sev[a.severity] - sev[b.severity]);
@@ -49,7 +49,7 @@ async function renderAudit(v, id) {
   <details class="card" style="margin-top:14px"><summary style="cursor:pointer;font-weight:700">Third parties seen (${tp.length}) and cookies (${(d.cookies || []).length})</summary>
     <div style="overflow:auto;margin-top:10px"><table style="width:100%;border-collapse:collapse;font-size:13.5px"><thead><tr style="text-align:left"><th style="padding:6px">Service</th><th style="padding:6px">Company</th><th style="padding:6px">Type</th><th style="padding:6px">Country</th><th style="padding:6px">Requests</th></tr></thead><tbody>${tp.sort((a, b) => (b.tracking - a.tracking) || b.count - a.count).map(t => `<tr style="border-top:1px solid var(--line)"><td style="padding:6px">${esc(t.name)}</td><td style="padding:6px">${esc(t.company || "Unknown")}</td><td style="padding:6px">${esc(t.cat)}</td><td style="padding:6px">${esc(t.country || "")}</td><td style="padding:6px">${t.count}</td></tr>`).join("")}</tbody></table>
     <p class="muted" style="font-size:13px">Cookies (${d.cookieSource === "browser" ? "read by the browser" : "only cookies visible to page scripts"}): ${(d.cookies || []).map(c => esc(c.name)).join(", ") || "none"}</p></div></details>
-  <p class="disc">Compliscope checks what any visitor’s browser receives, and re-requests the page once for its headers. It also fetches the site’s security.txt file and, for the secrets check, a few of the site’s own scripts — all of these requests go to the site being audited, and nothing is sent anywhere else. Results are indicative, not legal advice, and some issues can only be confirmed by people who run the site. Laws marked “check the official text” have newer or less settled section numbering.</p>`;
+  <p class="disc">AI Benar checks what any visitor’s browser receives, and re-requests the page once for its headers. It also fetches the site’s security.txt file and, for the secrets check, a few of the site’s own scripts — all of these requests go to the site being audited, and nothing is sent anywhere else. Results are indicative, not legal advice, and some issues can only be confirmed by people who run the site. Laws marked “check the official text” have newer or less settled section numbering.</p>`;
   const draw = () => {
     const list = F.filter(f => filter === "all" ? true : filter === "problems" ? f.status === "fail" || f.status === "warn" : filter === "pass" ? f.status === "pass" : f.cat === filter);
     $("#list").innerHTML = list.length ? list.map((f, i) => card(f, J, i < 3 && f.status === "fail")).join("") : `<p class="muted card">Nothing here. ${filter === "problems" ? "No problems found." : ""}</p>`;
@@ -58,8 +58,8 @@ async function renderAudit(v, id) {
   v.querySelector(".filters").onclick = e => { const b = e.target.closest("[data-f]"); if (!b) return; filter = b.dataset.f; v.querySelectorAll(".filters .chip").forEach(c => c.setAttribute("aria-pressed", c === b)); draw(); };
   $("#pdf").onclick = () => { $$(".find").forEach(x => (x.open = true)); setTimeout(() => print(), 50); };
   const rows = F.map(f => ({ category: CAT[f.cat], status: ST[f.status][1], severity: f.severity, finding: f.title, evidence: f.found.join(" | "), fix: f.fix || "", laws: R.refsFor(f, J).map(r => `${r.name}: ${r.refs.join("; ")}`).join(" || ") }));
-  $("#json").onclick = () => download(`compliscope-${d.host}-${new Date(d.id).toISOString().slice(0, 10)}.json`, JSON.stringify({ site: d.url, audited: new Date(d.id).toISOString(), mode: d.mode, grade: S.grade, score: S.score, jurisdictions: J, findings: rows, thirdParties: tp }, null, 2), "application/json");
-  $("#csv").onclick = () => { const cols = Object.keys(rows[0]); download(`compliscope-${d.host}.csv`, "\ufeff" + [cols, ...rows.map(r => cols.map(c => r[c]))].map(r => r.map(x => { const s = String(x); const q = /^[=+\-@]/.test(s) ? "'" + s : s; return /[",\n]/.test(q) ? `"${q.replace(/"/g, '""')}"` : q; }).join(",")).join("\r\n"), "text/csv"); };
+  $("#json").onclick = () => download(`ai-benar-${d.host}-${new Date(d.id).toISOString().slice(0, 10)}.json`, JSON.stringify({ site: d.url, audited: new Date(d.id).toISOString(), mode: d.mode, grade: S.grade, score: S.score, jurisdictions: J, findings: rows, thirdParties: tp }, null, 2), "application/json");
+  $("#csv").onclick = () => { const cols = Object.keys(rows[0]); download(`ai-benar-${d.host}.csv`, "\ufeff" + [cols, ...rows.map(r => cols.map(c => r[c]))].map(r => r.map(x => { const s = String(x); const q = /^[=+\-@]/.test(s) ? "'" + s : s; return /[",\n]/.test(q) ? `"${q.replace(/"/g, '""')}"` : q; }).join(",")).join("\r\n"), "text/csv"); };
   $("#retest").onclick = async () => {
     const origin = new URL(d.url).origin + "/*";
     let ok = await chrome.permissions.contains({ origins: [origin] }); if (!ok) ok = await chrome.permissions.request({ origins: [origin] });
@@ -80,7 +80,7 @@ function card(f, J, open) {
 /* ---------- laws ---------- */
 async function renderLaws(v) {
   const J = await getJ();
-  v.innerHTML = `<h1>Which laws should Compliscope check?</h1><p class="muted" style="max-width:70ch">Choose the places where your organisation works or where the people you serve live. The EU GDPR and EU AI Act are on by default. Security basics are always checked. Every finding shows the matching sections for each law you choose.</p>
+  v.innerHTML = `<h1>Which laws should AI Benar check?</h1><p class="muted" style="max-width:70ch">Choose the places where your organisation works or where the people you serve live. The EU GDPR and EU AI Act are on by default. Security basics are always checked. Every finding shows the matching sections for each law you choose.</p>
   <div class="grid2" style="margin-top:18px">${Object.entries(LAWS).map(([k, l]) => `<label class="lawcard"><input type="checkbox" value="${k}" ${J.includes(k) ? "checked" : ""}><span><b>${esc(l.name)}</b><small>${esc(l.region)}${l.verify ? " · section numbers to double-check" : ""}</small>${l.note ? `<small style="margin-top:4px">${esc(l.note)}</small>` : ""}</span></label>`).join("")}</div>
   <div style="display:flex;gap:8px;margin-top:18px"><button class="btn primary" id="saveLaws">Save</button><button class="btn" id="resetLaws">Back to GDPR and AI Act only</button></div>`;
   $("#saveLaws").onclick = async () => { const sel = $$(".lawcard input:checked").map(i => i.value); await chrome.storage.sync.set({ jurisdictions: sel.length ? sel : DEFAULT }); toast("Saved. Reports now show these laws."); let back = false; try { const ref = new URL(document.referrer); back = history.length > 1 && ref.pathname.endsWith("/app.html") && ref.origin === location.origin; } catch {} if (back) history.back(); };
@@ -128,11 +128,11 @@ async function renderHistory(v) {
   $("#clearAll").onclick = async () => { if (!confirm("Delete all saved audits?")) return; await chrome.storage.local.set({ audits: {} }); route(); };
 }
 function renderWelcome(v) {
-  v.innerHTML = `<section class="welcome"><div><h1>Check any website for privacy, AI Act and security issues</h1><p class="muted" style="font-size:1.08rem;margin-top:10px">Compliscope looks at what a website does in your browser: cookies and trackers, consent banners, AI chatbots, forms, security settings and exposed keys. It shows which sections of which laws may be at stake, and how to fix them.</p>
+  v.innerHTML = `<section class="welcome"><div><h1>Check any website for privacy, AI Act and security issues</h1><p class="muted" style="font-size:1.08rem;margin-top:10px">AI Benar looks at what a website does in your browser: cookies and trackers, consent banners, AI chatbots, forms, security settings and exposed keys. It shows which sections of which laws may be at stake, and how to fix them.</p>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px"><a class="btn primary" href="#navigator">Start the readiness navigator</a><a class="btn" href="#atlas">Explore the AI and data atlas</a><a class="btn" href="#laws">Choose your laws</a></div></div>
     <div class="card"><b>Built for small teams</b><p class="muted" style="margin:.4rem 0 0">Schools, charities, NGOs and non-profits across different countries can check their own websites and get a plain-language plan in the Readiness navigator.</p></div></section>
   <section class="steps"><div class="card"><b>1. Open a website</b><p class="muted" style="margin:.3rem 0 0">Your own site, or one you’re assessing, such as a supplier or partner.</p></div><div class="card"><b>2. Click “Audit this site”</b><p class="muted" style="margin:.3rem 0 0">Then “Re-test as a new visitor” to check what loads before consent.</p></div><div class="card"><b>3. Fix and share</b><p class="muted" style="margin:.3rem 0 0">Each finding says why it matters and what to do. Save the report as a PDF for your board or IT provider.</p></div></section>
-  <p style="margin-top:20px">Need a hand acting on this? <a href="https://suhaimizainalshah.github.io/Compliscope-Advisory/" target="_blank" rel="noopener">Compliscope Advisory</a> offers independent AI compliance and governance support.</p>
-  <p class="disc">Compliscope checks what any visitor’s browser sees, and re-requests the page once for its headers. It never probes servers or tests for break-ins, and it sends nothing anywhere except the site being audited. For deeper testing, get written permission from the site owner and use a qualified professional. Not legal advice.</p>`;
+  <p style="margin-top:20px">Need a hand acting on this? <a href="https://suhaimizainalshah.github.io/Compliscope-Advisory/" target="_blank" rel="noopener">AI Benar Advisory</a> offers independent AI compliance and governance support.</p>
+  <p class="disc">AI Benar checks what any visitor’s browser sees, and re-requests the page once for its headers. It never probes servers or tests for break-ins, and it sends nothing anywhere except the site being audited. For deeper testing, get written permission from the site owner and use a qualified professional. Not legal advice.</p>`;
 }
 route();
