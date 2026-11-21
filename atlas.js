@@ -1,4 +1,4 @@
-/* Compliscope atlas: AI governance and data security rules by country.
+/* AI Benar atlas: AI governance and data security rules by country.
    Last checked: 21 November 2026. Laws change quickly; always check the official sources listed.
    type: Binding (law in force), Voluntary (guidance), Draft (proposed), Policy (strategy, not law). */
 (() => {

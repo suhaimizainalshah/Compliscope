@@ -1,4 +1,4 @@
-/* Compliscope law catalogue. Each law lists the sections that relate to each audit topic.
+/* AI Benar law catalogue. Each law lists the sections that relate to each audit topic.
    This is an indicative map to help non-specialists find the right rule, not legal advice.
    Laws marked verify:true have newer or less settled numbering: always check the official text. */
 (() => {

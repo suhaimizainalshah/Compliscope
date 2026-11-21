@@ -1,4 +1,4 @@
-/* Compliscope readiness navigator: a plain-language plan for schools, charities, NGOs and
+/* AI Benar readiness navigator: a plain-language plan for schools, charities, NGOs and
    non-profits working across countries. Answers are stored only on this device. */
 (() => {
   const { LAWS } = globalThis.COMPLISCOPE_LAWS;
@@ -41,7 +41,7 @@
     add("cloud", "Check where your cloud tools store data", "Find out which countries your tools use, sign their data processing agreements, and check the legal basis for transfers abroad.", ["transfers"], has("cloud") || has("payments") || has("donors"));
     add("breach", "Plan what to do if data is lost or stolen", "Write a one-page plan: who decides, how to contain it, and when to notify. Deadlines are short: 72 hours under the GDPR and 3 calendar days in Singapore once you’ve assessed it.", ["breach"]);
     add("security", "Secure accounts, devices and backups", "Turn on two-step login for email and cloud tools, keep devices updated, give access only to those who need it, back up regularly, and train staff to spot phishing.", ["security"]);
-    add("website", "Audit your website’s cookies and consent", "Open your website, click Compliscope, choose “Audit this site”, then “Re-test as a new visitor”. Fix anything that tracks people before they agree.", ["consent_cookies"]);
+    add("website", "Audit your website’s cookies and consent", "Open your website, click AI Benar, choose “Audit this site”, then “Re-test as a new visitor”. Fix anything that tracks people before they agree.", ["consent_cookies"]);
     add("literacy", "Train staff and volunteers on AI", "Give everyone who uses AI a short briefing: what tools are approved, what data must never go in, how to check outputs, and when to tell people AI was used.", ["ai_literacy"], anyAI);
     add("disclose", "Tell people when they’re talking to AI", "Start chats with a clear line such as “I’m an AI assistant. Ask for a person any time.”", ["ai_disclosure"], uses("chatbot"));
     add("label", "Label AI-generated images, video and voices", "Add a visible “AI-generated” label to realistic synthetic media, and keep the original files and prompts.", ["ai_deepfake"], uses("images"));
@@ -99,7 +99,7 @@
     v.querySelectorAll("[data-copy]").forEach(b => (b.onclick = async () => { try { await navigator.clipboard.writeText(v.querySelector("#tpl" + b.dataset.copy).textContent); b.textContent = "Copied"; } catch {} }));
     v.querySelector("#useLaws")?.addEventListener("click", async () => { await chrome.storage.sync.set({ jurisdictions: laws.includes("EU_AIACT") ? laws : [...laws, "EU_AIACT"] }); const t = document.querySelector("#toast"); t.textContent = "Website audits will now check these laws"; t.classList.add("on"); setTimeout(() => t.classList.remove("on"), 2400); });
     v.querySelector("#navPdf").onclick = () => { v.querySelectorAll(".tpl").forEach(d => (d.open = true)); setTimeout(() => print(), 50); };
-    v.querySelector("#navJson").onclick = () => { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([JSON.stringify({ answers: S, laws, plan: A.map(x => ({ task: x.title, done: !!S.done[x.id], laws: x.refs })) }, null, 2)], { type: "application/json" })); a.download = `compliscope-plan-${(S.org || "organisation").replace(/\W+/g, "-")}.json`; a.click(); };
+    v.querySelector("#navJson").onclick = () => { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([JSON.stringify({ answers: S, laws, plan: A.map(x => ({ task: x.title, done: !!S.done[x.id], laws: x.refs })) }, null, 2)], { type: "application/json" })); a.download = `ai-benar-plan-${(S.org || "organisation").replace(/\W+/g, "-")}.json`; a.click(); };
     v.querySelector("#navReset").onclick = () => { if (!confirm("Clear your answers and start again?")) return; S = { ...DEF, done: {} }; save(); draw(v); };
   }
   globalThis.COMPLISCOPE_NAV = { render };

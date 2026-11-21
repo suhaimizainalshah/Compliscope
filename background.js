@@ -1,4 +1,4 @@
-/* Compliscope service worker: runs passive audits, stores them on this device, and re-tests a
+/* AI Benar service worker: runs passive audits, stores them on this device, and re-tests a
    site as a first-time visitor (clearing only that site's data, with your permission). */
 function probe() {
   const libs = [], add = (n, v) => { if (v) libs.push({ name: n, version: String(v) }); };
@@ -19,7 +19,7 @@ function probe() {
 const URL_LIBS = [[/jquery[.-](\d+\.\d+\.\d+)/i, "jQuery"], [/jquery@(\d+\.\d+\.\d+)/i, "jQuery"], [/jquery-ui[.-](\d+\.\d+\.\d+)/i, "jQuery UI"], [/bootstrap[@/.-](\d+\.\d+\.\d+)/i, "Bootstrap"], [/angular(?:js)?[@/.-](1\.\d+\.\d+)/i, "AngularJS"], [/lodash[@/.-](\d+\.\d+\.\d+)/i, "Lodash"], [/moment[@/.-](\d+\.\d+\.\d+)/i, "Moment.js"], [/handlebars[@/.-](\d+\.\d+\.\d+)/i, "Handlebars"], [/underscore[@/.-](\d+\.\d+\.\d+)/i, "Underscore"]];
 let lastId = 0;
 async function audit(tab, mode = "current") {
-  if (!/^https?:/.test(tab?.url || "")) throw new Error("Compliscope can only audit websites (http or https pages).");
+  if (!/^https?:/.test(tab?.url || "")) throw new Error("AI Benar can only audit websites (http or https pages).");
   const [{ result: data }] = await chrome.scripting.executeScript({ target: { tabId: tab.id }, files: ["trackers.js", "collect.js"] });
   if (!data) throw new Error("The page didn’t respond. Reload it and try again.");
   try { const [{ result: p }] = await chrome.scripting.executeScript({ target: { tabId: tab.id }, world: "MAIN", func: probe }); data.libs = p.libs; data.tcf = p.tcf; data.gpp = p.gpp; if (p.chatGlobals.length) data.chat = [...new Set([...(data.chat || []).filter(c => c !== "Chat widget"), ...p.chatGlobals])]; } catch { data.libs = []; }
@@ -49,7 +49,7 @@ chrome.runtime.onMessage.addListener((m, _s, reply) => {
 });
 chrome.runtime.onInstalled.addListener(async ({ reason }) => {
   const { jurisdictions } = await chrome.storage.sync.get("jurisdictions"); if (!jurisdictions) chrome.storage.sync.set({ jurisdictions: ["EU_GDPR", "EU_AIACT"] });
-  chrome.contextMenus.removeAll(() => { chrome.contextMenus.create({ id: "audit", title: "Audit this site with Compliscope", contexts: ["page"] }); });
+  chrome.contextMenus.removeAll(() => { chrome.contextMenus.create({ id: "audit", title: "Audit this site with AI Benar", contexts: ["page"] }); });
   if (reason === "install") chrome.tabs.create({ url: "app.html#welcome" });
 });
 chrome.contextMenus.onClicked.addListener(async (_i, tab) => { try { const id = await audit(tab); chrome.tabs.create({ url: `app.html#audit=${id}`, index: tab.index + 1 }); } catch {} });

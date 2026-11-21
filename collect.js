@@ -1,4 +1,4 @@
-/* Compliscope collector. Reads only what this page already exposes to any visitor: its content,
+/* AI Benar collector. Reads only what this page already exposes to any visitor: its content,
    the resources it has loaded, its own response headers, its readable cookies and its public
    security.txt file. It does not probe, submit forms, or attack anything. */
 (async () => {
