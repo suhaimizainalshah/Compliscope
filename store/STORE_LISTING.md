@@ -24,17 +24,19 @@ SECURITY BASICS
 • Secret keys accidentally published in page code (shown masked)
 
 THE LAWS THAT APPLY
-• EU GDPR and EU AI Act by default, plus UK, Singapore, Malaysia, Indonesia, Vietnam, Thailand, Philippines, India, Pakistan, China, Australia, the US, Brazil, South Africa, Kenya and Nigeria
+• EU GDPR and EU AI Act by default, plus UK, Singapore, Malaysia, Indonesia, Vietnam, Thailand, Philippines, India, Pakistan, China, South Korea, Australia, the US, Brazil, South Africa, Kenya and Nigeria
 • Every finding shows the matching sections for each law you choose
 
 AI AND DATA SECURITY ATLAS
-• Dated profiles of AI and data rules in ASEAN, Singapore, Malaysia, Indonesia, Vietnam, Thailand, the Philippines, India, Pakistan, China and the United States
+• Dated profiles of AI and data rules in ASEAN, Singapore, Malaysia, Indonesia, Vietnam, Thailand, the Philippines, India, Pakistan, China, South Korea and the United States
 • What’s binding, voluntary or in draft, breach deadlines, DPO rules and what it means for your website
 
 READINESS NAVIGATOR
 • A plain-language plan for schools, charities, NGOs and non-profits across countries, with AI Act classification, an action plan and ready-to-use templates
 
 Passive checks only, all on your device. Not legal advice.
+
+Need a hand acting on what Compliscope finds? Compliscope Advisory (https://suhaimizainalshah.github.io/Compliscope-Advisory/) offers independent AI compliance and governance support.
 
 ## Category
 Productivity (or Developer Tools)
