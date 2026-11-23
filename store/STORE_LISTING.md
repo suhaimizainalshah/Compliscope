@@ -36,7 +36,7 @@ READINESS NAVIGATOR
 
 Passive checks only, all on your device. Not legal advice.
 
-Need a hand acting on what AI Benar finds? AI Benar Advisory (https://suhaimizainalshah.github.io/Compliscope-Advisory/) offers independent AI compliance and governance support.
+Need a hand acting on what AI Benar finds? AI Benar Advisory (https://suhaimizainalshah.github.io/AI-Benar-Advisory/) offers independent AI compliance and governance support.
 
 ## Category
 Productivity (or Developer Tools)

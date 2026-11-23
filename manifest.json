@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "AI Benar: Privacy, AI Law and Security Checker",
   "short_name": "AI Benar",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "Check websites for GDPR, EU AI Act and Asian and US AI and data laws, with plain fixes, an AI law atlas and a plan for non-profits.",
   "minimum_chrome_version": "116",
   "homepage_url": "https://github.com/suhaimizainalshah/Compliscope",

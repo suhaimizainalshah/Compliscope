@@ -4,7 +4,7 @@
 
 AI Benar looks at what a website does in your browser, explains problems in plain language, shows **which sections of which laws** each problem may contravene, and says how to fix it. Everything runs on your device.
 
-Made by [AI Benar Advisory](https://suhaimizainalshah.github.io/Compliscope-Advisory/) — independent AI compliance and governance support for the EU, Vietnam, South Korea and ASEAN.
+Made by [AI Benar Advisory](https://suhaimizainalshah.github.io/AI-Benar-Advisory/) — independent AI compliance and governance support for the EU, Vietnam, South Korea and ASEAN.
 
 ## What it checks
 
@@ -25,7 +25,13 @@ Made by [AI Benar Advisory](https://suhaimizainalshah.github.io/Compliscope-Advi
 - Biometrics, missing AI statements, and labelling of AI-generated media.
 
 ### Security basics
-HTTPS, insecure files on secure pages, six recommended security headers, server version disclosure, cookie security flags, outdated JavaScript libraries with known CVEs, **secret keys published in page code** (masked), scripts without integrity checks, insecure forms, and a security.txt contact.
+HTTPS, insecure files on secure pages, six recommended security headers, server version disclosure, cookie security flags, outdated JavaScript libraries with known CVEs (from the retire.js vulnerability repository), **secret keys published in page code** (masked), scripts without integrity checks, insecure forms, and a security.txt contact.
+
+### Accessibility
+Runs **axe-core**, the open-source accessibility engine, on the page and reports barriers that can be found automatically against **WCAG 2.x A and AA** (such as missing image descriptions, unlabelled form fields, buttons without names and low contrast), with the success criterion for each. Findings map to the **European Accessibility Act** (Directive (EU) 2019/882, applying to many consumer services since 28 June 2025), the **Web Accessibility Directive**, the **UK Equality Act 2010** and public sector accessibility regulations, and the **ADA** in the United States. Automated checks find only some problems, so AI Benar also recommends testing with a keyboard, a screen reader and real users.
+
+### Turn findings into an action board
+**Make an action board** opens the problems as a board in **If Leaves Weave Boards**: each problem becomes a card in *To fix* or *To check*, with a priority, a due date (14 days for high, 30 for medium), the evidence, the fix, the relevant laws and a short checklist. The board travels in the link’s “#” part, which browsers never send to a server, and If Leaves Weave saves it on your device and removes it from the address bar. Change `BOARDS_URL` in `app.js` if you host If Leaves Weave elsewhere.
 
 ### Laws you can choose
 EU GDPR and ePrivacy and the EU AI Act are **on by default**. You can add: UK GDPR, DPA 2018 and PECR; Singapore PDPA and AI frameworks; Malaysia PDPA; Indonesia PDP Law; Vietnam PDP Law and AI Law; Thailand PDPA; Philippines Data Privacy Act; India DPDP Act and IT Rules; Pakistan PECA and National AI Policy; China PIPL and AI rules; Australia Privacy Act; California CCPA/CPRA; US federal and other states; Brazil LGPD; South Africa POPIA; Kenya Data Protection Act; Nigeria Data Protection Act. Each finding lists the matching sections for every law you choose. Laws with newer or less settled numbering are marked “check the official text”.
@@ -81,3 +87,8 @@ popup.html/js   toolbar panel
 
 ## Licence
 MIT. Corrections to the law catalogue are especially welcome.
+
+## Open-source data and libraries
+- **axe-core** 4.14.1 (Mozilla Public License 2.0): `vendor/axe.min.js`, licence in `vendor/LICENSE-axe-core.txt`.
+- **retire.js vulnerability repository** (Apache License 2.0): known vulnerabilities for the JavaScript libraries AI Benar detects, extracted into `vendor/vulns.js`, licence in `vendor/LICENSE-retire.txt`.
+- **Open Cookie Database** (Apache License 2.0): cookie names, purposes and platforms in `vendor/cookies.js`, licence in `vendor/LICENSE-open-cookie-database.txt`.

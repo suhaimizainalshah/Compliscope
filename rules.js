@@ -1,12 +1,8 @@
 /* AI Benar rules: turn what the collector saw into findings, each tied to topics that the law
    catalogue maps to specific sections in each jurisdiction you choose. */
 (() => {
-  const VULN = [
-    ["jQuery", "3.5.0", "CVE-2020-11022 and CVE-2020-11023 (cross-site scripting)"], ["jQuery UI", "1.13.0", "CVE-2021-41182 to 41184 (cross-site scripting)"],
-    ["Bootstrap", "3.4.1", "CVE-2019-8331 (cross-site scripting)", v => v[0] === 3], ["Bootstrap", "4.3.1", "CVE-2019-8331 (cross-site scripting)", v => v[0] === 4],
-    ["Lodash", "4.17.21", "CVE-2021-23337 (command injection) and CVE-2020-8203 (prototype pollution)"], ["Moment.js", "2.29.4", "CVE-2022-31129 (denial of service)"],
-    ["Handlebars", "4.7.7", "CVE-2021-23369 (remote code execution)"], ["Underscore", "1.12.1", "CVE-2021-23358 (code injection)"], ["DOMPurify", "2.4.2", "several bypasses fixed in later versions"],
-  ];
+  /* Known vulnerabilities come from the retire.js repository (vendor/vulns.js, Apache 2.0). */
+  const VDB = globalThis.AIBenarVulns || {}, SEVR = { critical: 4, high: 3, medium: 2, low: 1 };
   const ver = s => String(s || "").split(/[^\d]+/).filter(Boolean).map(Number);
   const lt = (a, b) => { a = ver(a); b = ver(b); for (let i = 0; i < Math.max(a.length, b.length); i++) { const x = a[i] || 0, y = b[i] || 0; if (x !== y) return x < y; } return false; };
   const list = (arr, n = 6) => arr.slice(0, n).concat(arr.length > n ? [`and ${arr.length - n} more`] : []);
@@ -18,7 +14,21 @@
     const tp = Object.values(d.thirdParties || {}), trackers = tp.filter(t => t.tracking), ads = tp.filter(t => t.cat === "ads"), session = tp.filter(t => t.cat === "session");
     const bannerShowing = d.banner?.visible, firstVisit = d.mode === "first-visit";
     const cookieNames = (d.cookies || []).map(c => c.name);
-    const trackingCookies = (d.cookies || []).filter(c => /^(_ga|_gid|_gat|_gcl|_fbp|_fbc|fr$|_ttp|_pin|_uet|_clck|_clsk|_hj|ajs_|mp_|amplitude|hubspotutk|__hs|_li|li_|ln_or|IDE$|test_cookie|_scid|personalization_id|muc_ads|_tt_)/i.test(c.name));
+    /* Cookie purposes from the Open Cookie Database (vendor/cookies.js, Apache 2.0), plus a built-in list of common trackers. */
+    const OCD = globalThis.AIBenarCookies || { exact: {}, prefix: [] }, OCAT = { A: "analytics", M: "marketing", F: "functional", N: "necessary", S: "security", P: "personalisation" };
+    const cookieInfo = n => { const e = OCD.exact[n] || (OCD.prefix.find(([p]) => n.startsWith(p)) || []).slice(1); return e && e.length ? { purpose: OCAT[e[0]] || "", platform: e[1] || "" } : null; };
+    const trackingCookies = (d.cookies || []).filter(c => /^(_ga|_gid|_gat|_gcl|_fbp|_fbc|fr$|_ttp|_pin|_uet|_clck|_clsk|_hj|ajs_|mp_|amplitude|hubspotutk|__hs|_li|li_|ln_or|IDE$|test_cookie|_scid|personalization_id|muc_ads|_tt_)/i.test(c.name) || /^(analytics|marketing)$/.test(cookieInfo(c.name)?.purpose || ""));
+    d.cookies?.forEach(c => { const i = cookieInfo(c.name); if (i) { c.purpose = i.purpose; c.platform = i.platform; } });
+
+    /* ---------------- ACCESSIBILITY (axe-core) ---------------- */
+    if (d.a11y) {
+      const IMP = { critical: 4, serious: 3, moderate: 2, minor: 1 }, vs = [...d.a11y.violations].sort((a, b) => (IMP[b.impact] || 0) - (IMP[a.impact] || 0) || b.count - a.count);
+      vs.slice(0, 10).forEach(v => add({ id: "a11y-" + v.id, cat: "access", status: "fail", severity: (IMP[v.impact] || 0) >= 3 ? "high" : (IMP[v.impact] || 0) === 2 ? "medium" : "low", title: v.help,
+        found: [`${v.count} place${v.count > 1 ? "s" : ""} on this page${(() => { const sc = [...new Set(v.tags.filter(t => /^wcag\d{3,}$/.test(t)).map(t => { const n = t.slice(4); return `${n[0]}.${n[1]}.${n.slice(2)}`; }))]; return sc.length ? ` (WCAG ${sc.join(", ")})` : ""; })()}`, ...v.sample.filter(Boolean).map(x => `For example: ${x}`)],
+        why: "People who use screen readers, keyboards, magnification or voice control may not be able to use this part of the page.", fix: `See the axe-core guidance: ${v.url}`, topics: ["accessibility"] }));
+      if (vs.length > 10) add({ id: "a11y-more", cat: "access", status: "warn", severity: "medium", title: `${vs.length - 10} more accessibility rules failed`, found: vs.slice(10).map(v => `${v.help} (${v.count})`), why: "Each is a separate barrier.", fix: "Fix the most serious ones first, then run the audit again.", topics: ["accessibility"] });
+      if (!vs.length) add({ id: "a11y-none", cat: "access", status: "pass", severity: "low", title: "No automatically detectable accessibility problems", found: [`axe-core ${d.a11y.version || ""} checked WCAG 2.x A and AA rules.`], why: "Automated checks find roughly a third of accessibility problems.", fix: "Also test with a keyboard, a screen reader and real users.", topics: ["accessibility"] });
+    }
 
     /* ---------------- PRIVACY ---------------- */
     if (trackers.length) {
@@ -104,7 +114,11 @@
     const weakCookies = (d.cookies || []).filter(c => (d.https && c.secure === false) || /sess|auth|token|login|sid/i.test(c.name) && c.httpOnly === false || c.sameSite === "no_restriction" && c.secure === false);
     if (weakCookies.length) add({ id: "cookie-flags", cat: "security", status: "warn", severity: "medium", title: "Some cookies are missing security settings", found: list(weakCookies.map(c => `${c.name}: ${[d.https && c.secure === false && "not Secure", /sess|auth|token|login|sid/i.test(c.name) && c.httpOnly === false && "readable by scripts (no HttpOnly)", c.sameSite === "no_restriction" && c.secure === false && "SameSite=None without Secure"].filter(Boolean).join(", ")}`), 8),
       why: "Cookies without Secure can travel unencrypted, and login cookies readable by scripts can be stolen in cross-site scripting attacks.", fix: "Set Secure on all cookies, HttpOnly on login and session cookies, and SameSite=Lax or Strict where possible.", topics: ["security"], standards: "cookies" });
-    (d.libs || []).forEach(l => { const v = VULN.filter(x => x[0] === l.name && (!x[3] || x[3](ver(l.version)))).find(x => lt(l.version, x[1])); if (v) add({ id: "lib-" + l.name, cat: "security", status: "fail", severity: "medium", title: `Outdated ${l.name} ${l.version} has known vulnerabilities`, found: [`${l.name} ${l.version} is older than ${v[1]}: ${v[2]}`], why: "Attackers scan for libraries with published weaknesses.", fix: `Update ${l.name} to the latest version and retest your site.`, topics: ["security"], standards: "libraries" }); if (l.name === "AngularJS") add({ id: "lib-angularjs", cat: "security", status: "warn", severity: "medium", title: `AngularJS ${l.version} is no longer supported`, found: ["AngularJS reached end of life in January 2022 and gets no security fixes."], fix: "Plan a move to a supported framework.", topics: ["security"], standards: "libraries" }); });
+    (d.libs || []).forEach(l => { const hits = (VDB[l.name] || []).filter(x => lt(l.version, x.below) && (!x.atOrAbove || !lt(l.version, x.atOrAbove))); if (!hits.length) return;
+      const worst = hits.reduce((m, x) => (SEVR[x.sev] || 2) > (SEVR[m.sev] || 2) ? x : m, hits[0]), cves = [...new Set(hits.flatMap(x => x.cve))], fixAt = hits.map(x => x.below).sort((p, q) => lt(p, q) ? 1 : -1)[0];
+      add({ id: "lib-" + l.name, cat: "security", status: "fail", severity: (SEVR[worst.sev] || 2) >= 3 ? "high" : "medium", title: `Outdated ${l.name} ${l.version} has known vulnerabilities`,
+        found: [`${hits.length} known issue${hits.length > 1 ? "s" : ""}${cves.length ? `, including ${cves.slice(0, 5).join(", ")}${cves.length > 5 ? ` and ${cves.length - 5} more` : ""}` : ""}.`, ...(worst.sum ? [`Most serious: ${worst.sum}`] : [])],
+        why: "Attackers look for sites running library versions with published vulnerabilities, because the attacks are already written.", fix: `Update ${l.name} to version ${fixAt} or later, then test the pages that use it.`, topics: ["security"] }); });
     if (d.secrets?.length) add({ id: "secrets", cat: "security", status: "fail", severity: "high", title: "Secret keys appear in the page’s code", found: d.secrets.map(s => `${s.kind} ${s.masked} in ${s.where}`),
       why: "Anyone can view page code. Exposed secret keys let others use your accounts, read data or run up bills. Google browser keys are designed to be public but must be restricted.", fix: "Revoke and replace exposed keys now, move them to your server, and add key restrictions. If this isn’t your site, report it privately through the site’s security contact, never publicly.", topics: ["security"], standards: "secrets" });
     else add({ id: "secrets-none", cat: "security", status: "pass", severity: "low", title: "No secret keys found in the page’s code", found: [`${d.scriptsScanned || 0} scripts checked for common key formats.`], topics: [] });

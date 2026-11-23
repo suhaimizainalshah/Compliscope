@@ -25,21 +25,29 @@
     },
     EU_AIACT: {
       name: "EU AI Act", short: "AI Act", region: "European Union / EEA", default: true, url: "https://eur-lex.europa.eu/eli/reg/2024/1689/oj",
-      note: "Regulation (EU) 2024/1689, as amended by the Digital Omnibus, Regulation (EU) 2026/1744. Prohibitions and AI literacy since 2 Feb 2025; Article 50 transparency since 2 Aug 2026; Annex III high-risk duties from 2 Dec 2027.",
+      note: "Regulation (EU) 2024/1689, as amended by the Digital Omnibus, Regulation (EU) 2026/1744. Prohibitions and AI literacy since 2 Feb 2025; Article 50 transparency since 2 Aug 2026; two new Article 5 bans, and Article 50(2) marking for generative systems already on the market, from 2 Dec 2026; Annex III high-risk duties from 2 Dec 2027; Annex I product duties from 2 Aug 2028.",
       refs: {
         ai_disclosure: ["AI Act Art. 50(1) (people must be told they are interacting with an AI system), applies since 2 Aug 2026", "AI Act Art. 50(3) (deployers of emotion-recognition or biometric categorisation systems must inform the people concerned), applies since 2 Aug 2026"],
-        ai_marking: ["AI Act Art. 50(2) (machine-readable marking of AI-generated content; systems already on the market have until 2 Dec 2026)"],
+        ai_marking: ["AI Act Art. 50(2) (providers of generative AI must mark outputs in a machine-readable, detectable way; required from launch for systems placed on the market from 2 Aug 2026, and by 2 Dec 2026 for systems placed on the market before then, under Art. 111(4))"],
         ai_deepfake: ["AI Act Art. 50(4) (disclose deepfakes and AI-generated text published on matters of public interest)"],
         ai_highrisk: ["AI Act Art. 6 and Annex III (high-risk uses in education, employment, essential services and credit), duties apply from 2 Dec 2027", "AI Act Art. 26 (duties of deployers of high-risk AI)", "AI Act Art. 27 (fundamental rights impact assessment for public bodies and providers of public services)"],
-        ai_prohibited: ["AI Act Art. 5(1)(f) (emotion recognition in workplaces and education is banned, except for medical or safety reasons)", "AI Act Art. 5(1)(c) (social scoring is banned)", "AI Act Art. 5(1)(g) (biometric categorisation to infer sensitive traits is banned)", "AI Act Art. 5(1)(ba) (AI-generated non-consensual intimate images are banned, applies from 2 Dec 2026)", "AI Act Art. 5(1)(bb) (AI-generated child sexual abuse material is banned, applies from 2 Dec 2026)"],
+        ai_prohibited: ["AI Act Art. 5(1)(f) (emotion recognition in workplaces and education is banned, except for medical or safety reasons)", "AI Act Art. 5(1)(c) (social scoring is banned)", "AI Act Art. 5(1)(g) (biometric categorisation to infer sensitive traits is banned)", "AI Act Art. 5(1)(ba) (AI systems that generate or manipulate realistic intimate images, video or audio of an identifiable person without their explicit consent are banned, from 2 Dec 2026)", "AI Act Art. 5(1)(bb) (AI systems that generate child sexual abuse material are banned, from 2 Dec 2026)"],
         ai_literacy: ["AI Act Art. 4 (AI literacy), as amended by Regulation (EU) 2026/1744"],
         ai_security: ["AI Act Art. 15 (accuracy, robustness and cybersecurity for high-risk AI)"],
+      },
+    },
+    EU_ACCESS: {
+      name: "EU accessibility law", short: "Accessibility", region: "European Union / EEA", default: true, url: "https://eur-lex.europa.eu/eli/dir/2019/882/oj",
+      note: "The European Accessibility Act applies to many consumer products and services, such as e-commerce, banking, e-books, transport and communications, since 28 June 2025. Public sector bodies follow the Web Accessibility Directive. Both point to the EN 301 549 standard, which uses WCAG.",
+      refs: {
+        accessibility: ["European Accessibility Act, Directive (EU) 2019/882, Art. 4 and Annex I (accessibility requirements for products and services, applies since 28 June 2025)", "Web Accessibility Directive (EU) 2016/2102, Art. 4 (public sector websites and apps must be accessible)", "EN 301 549 (harmonised standard, which refers to WCAG 2.1 AA)"],
       },
     },
     UK: {
       name: "UK GDPR, DPA 2018 and PECR", short: "UK", region: "United Kingdom", url: "https://ico.org.uk/for-organisations/",
       note: "The Data (Use and Access) Act 2025 amends these laws, including limited cookie exemptions for some low-risk uses such as certain analytics, with an opt-out. Check the ICO’s current guidance.",
       refs: {
+        accessibility: ["Equality Act 2010, s. 20 and s. 29 (service providers must make reasonable adjustments for disabled people, including online)", "Public Sector Bodies (Websites and Mobile Applications) Accessibility Regulations 2018 (public sector, WCAG 2.2 AA)"],
         consent_cookies: ["PECR 2003, reg. 6 (consent for non-essential cookies), as amended by the Data (Use and Access) Act 2025", "UK GDPR Art. 6(1)(a) and Art. 7"],
         dark_patterns: ["UK GDPR Art. 4(11) and Art. 7(3)"], prechecked: ["UK GDPR Art. 4(11) (pre-ticked boxes are not consent)"],
         transparency: ["UK GDPR Art. 12–14"], contact: ["UK GDPR Art. 13(1)(a)–(b)", "UK GDPR Art. 37 (DPO where required)"], transfers: ["UK GDPR Art. 44–49"],
@@ -184,6 +192,7 @@
       name: "US federal and other states", short: "US federal", region: "United States", url: "https://www.ftc.gov/",
       note: "No comprehensive federal privacy or AI law. Federal agencies enforce existing laws; Texas, Illinois, Utah, New York City and Colorado have AI-specific rules; every state has a breach notification law.",
       refs: {
+        accessibility: ["Americans with Disabilities Act, Titles II and III (courts and the Department of Justice have applied them to websites)", "ADA Title II rule, 28 CFR Part 35 Subpart H (state and local government web content to WCAG 2.1 AA; check current compliance dates)"],
         transparency: ["FTC Act §5 (deceptive practices, including misleading privacy and AI claims)"], security: ["FTC Act §5 (unfair data security practices)", "Sector rules: HIPAA, GLBA Safeguards Rule"],
         children: ["COPPA and the FTC COPPA Rule (children under 13)", "FERPA (student education records)"], breach: ["State breach notification laws (deadlines vary by state)"],
         ai_deepfake: ["TAKE IT DOWN Act 2025 (non-consensual intimate deepfakes)"], ai_disclosure: ["Utah AI Policy Act (disclose generative AI use in certain contexts)", "FTC Act §5 (don’t mislead people about AI)"],

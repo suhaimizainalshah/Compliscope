@@ -4,10 +4,12 @@ const { LAWS, DEFAULT } = globalThis.COMPLISCOPE_LAWS, R = globalThis.COMPLISCOP
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const GC = { A: "#16a34a", B: "#65a30d", C: "#ca8a04", D: "#ea580c", E: "#dc2626", F: "#991b1b" };
 const ST = { fail: ["✕", "Problem"], warn: ["!", "Check"], info: ["i", "Note"], pass: ["✓", "Good"] };
-const CAT = { privacy: "Privacy and cookies", ai: "AI Act", security: "Security" };
+const CAT = { privacy: "Privacy and cookies", ai: "AI Act", security: "Security", access: "Accessibility" };
 function toast(m) { const t = $("#toast"); t.textContent = m; t.classList.add("on"); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove("on"), 2400); }
 async function getJ() { const { jurisdictions } = await chrome.storage.sync.get("jurisdictions"); return jurisdictions?.length ? jurisdictions : DEFAULT; }
 async function getAudits() { const { audits = {} } = await chrome.storage.local.get("audits"); return audits; }
+/* If Leaves Weave Boards address. Change this if you host If Leaves Weave somewhere else. */
+const BOARDS_URL = "https://suhaimizainalshah.github.io/ifleavesweave/boards.html";
 function download(name, text, type) { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([text], { type })); a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 4000); }
 
 /* ---------- router ---------- */
@@ -40,15 +42,15 @@ async function renderAudit(v, id) {
     <div class="grade" style="background:${GC[S.grade]}" role="img" aria-label="Grade ${S.grade}, score ${S.score} out of 100"><div>${S.grade}<small>${S.score}/100</small></div></div>
     <div><h1>${esc(d.host)}</h1><div class="meta"><span>${esc((d.title || "").slice(0, 90))}</span><span>${new Date(d.id).toLocaleString()}</span><span>${d.mode === "first-visit" ? "Tested as a new visitor" : "Tested in your current session"}</span></div>
       <div class="lawbar"><span class="muted" style="font-size:13px">Checked against</span>${J.map(k => `<span class="lawchip">${esc(LAWS[k]?.short || k)}</span>`).join("")}<span class="lawchip">Security basics</span><a href="#laws" style="font-size:13px;font-weight:650">Change</a></div></div>
-    <div class="actions"><button class="btn primary" id="retest" title="Clears this site’s cookies and storage, reloads it and audits again">Re-test as a new visitor</button><button class="btn" id="pdf">Save as PDF</button><button class="btn" id="json">JSON</button><button class="btn" id="csv">CSV</button></div>
+    <div class="actions"><button class="btn primary" id="retest" title="Clears this site’s cookies and storage, reloads it and audits again">Re-test as a new visitor</button><button class="btn" id="pdf">Save as PDF</button><button class="btn" id="json">JSON</button><button class="btn" id="csv">CSV</button><button class="btn" id="board" title="Open these findings as an action board in If Leaves Weave Boards">Make an action board</button></div>
   </section>
   ${d.mode !== "first-visit" ? `<p class="card noprint" style="margin-top:12px;padding:12px 16px;font-size:14px">For the most accurate consent results, use <b>Re-test as a new visitor</b>. It clears only this site’s cookies and storage in your browser, reloads the page, and checks what loads before any choice is made.</p>` : ""}
   <section class="sum">${Object.entries(CAT).map(([c, n]) => `<div class="card"><h3><span>${n}</span></h3><div class="pills">${count(c, "fail") ? `<span class="pill"><i class="bgfail"></i>${count(c, "fail")} problem${count(c, "fail") > 1 ? "s" : ""}</span>` : ""}${count(c, "warn") ? `<span class="pill"><i class="bgwarn"></i>${count(c, "warn")} to check</span>` : ""}${count(c, "pass") ? `<span class="pill"><i class="bgpass"></i>${count(c, "pass")} good</span>` : ""}${count(c, "info") ? `<span class="pill"><i class="bginfo"></i>${count(c, "info")} note${count(c, "info") > 1 ? "s" : ""}</span>` : ""}</div></div>`).join("")}</section>
-  <div class="filters" role="toolbar" aria-label="Filter findings">${[["problems", "Problems and checks"], ["all", "Everything"], ["privacy", "Privacy"], ["ai", "AI Act"], ["security", "Security"], ["pass", "Passed"]].map(([k, l]) => `<button class="chip" data-f="${k}" aria-pressed="${filter === k}">${l}</button>`).join("")}</div>
+  <div class="filters" role="toolbar" aria-label="Filter findings">${[["problems", "Problems and checks"], ["all", "Everything"], ["privacy", "Privacy"], ["ai", "AI Act"], ["security", "Security"], ["access", "Accessibility"], ["pass", "Passed"]].map(([k, l]) => `<button class="chip" data-f="${k}" aria-pressed="${filter === k}">${l}</button>`).join("")}</div>
   <section id="list"></section>
   <details class="card" style="margin-top:14px"><summary style="cursor:pointer;font-weight:700">Third parties seen (${tp.length}) and cookies (${(d.cookies || []).length})</summary>
     <div style="overflow:auto;margin-top:10px"><table style="width:100%;border-collapse:collapse;font-size:13.5px"><thead><tr style="text-align:left"><th style="padding:6px">Service</th><th style="padding:6px">Company</th><th style="padding:6px">Type</th><th style="padding:6px">Country</th><th style="padding:6px">Requests</th></tr></thead><tbody>${tp.sort((a, b) => (b.tracking - a.tracking) || b.count - a.count).map(t => `<tr style="border-top:1px solid var(--line)"><td style="padding:6px">${esc(t.name)}</td><td style="padding:6px">${esc(t.company || "Unknown")}</td><td style="padding:6px">${esc(t.cat)}</td><td style="padding:6px">${esc(t.country || "")}</td><td style="padding:6px">${t.count}</td></tr>`).join("")}</tbody></table>
-    <p class="muted" style="font-size:13px">Cookies (${d.cookieSource === "browser" ? "read by the browser" : "only cookies visible to page scripts"}): ${(d.cookies || []).map(c => esc(c.name)).join(", ") || "none"}</p></div></details>
+    <p class="muted" style="font-size:13px">Cookies, with purposes from the Open Cookie Database where known (${d.cookieSource === "browser" ? "read by the browser" : "only cookies visible to page scripts"}): ${(d.cookies || []).map(c => esc(c.name) + (c.platform || c.purpose ? ` <span class="muted">(${esc([c.platform, c.purpose].filter(Boolean).join(", "))})</span>` : "")).join(", ") || "none"}</p></div></details>
   <p class="disc">AI Benar checks what any visitor’s browser receives, and re-requests the page once for its headers. It also fetches the site’s security.txt file and, for the secrets check, a few of the site’s own scripts — all of these requests go to the site being audited, and nothing is sent anywhere else. Results are indicative, not legal advice, and some issues can only be confirmed by people who run the site. Laws marked “check the official text” have newer or less settled section numbering.</p>`;
   const draw = () => {
     const list = F.filter(f => filter === "all" ? true : filter === "problems" ? f.status === "fail" || f.status === "warn" : filter === "pass" ? f.status === "pass" : f.cat === filter);
@@ -58,6 +60,24 @@ async function renderAudit(v, id) {
   v.querySelector(".filters").onclick = e => { const b = e.target.closest("[data-f]"); if (!b) return; filter = b.dataset.f; v.querySelectorAll(".filters .chip").forEach(c => c.setAttribute("aria-pressed", c === b)); draw(); };
   $("#pdf").onclick = () => { $$(".find").forEach(x => (x.open = true)); setTimeout(() => print(), 50); };
   const rows = F.map(f => ({ category: CAT[f.cat], status: ST[f.status][1], severity: f.severity, finding: f.title, evidence: f.found.join(" | "), fix: f.fix || "", laws: R.refsFor(f, J).map(r => `${r.name}: ${r.refs.join("; ")}`).join(" || ") }));
+  /* Action board: open the findings in If Leaves Weave Boards. The board travels in the link's "#" part,
+     which browsers never send to a server, so the audit stays on this device. */
+  $("#board").onclick = async () => {
+    const today = new Date(), day = n => { const x = new Date(today); x.setDate(x.getDate() + n); return x.toISOString().slice(0, 10); }, id = () => Math.random().toString(36).slice(2, 10);
+    const cols = [["To fix", "#C2362B"], ["To check", "#B86E00"], ["In progress", "#2453D6"], ["Done", "#2F7D4F"]].map(([name, color]) => ({ id: id(), name, color }));
+    const labels = Object.entries(CAT).map(([k, name], i) => ({ id: id(), key: k, name, color: ["#7A4FC2", "#2453D6", "#0E7C7B", "#B86E00"][i % 4] }));
+    const cards = F.filter(f => f.status === "fail" || f.status === "warn").map(f => { const laws = R.refsFor(f, J).map(r => `${r.name}: ${r.refs.join("; ")}`);
+      return { id: id(), col: cols[f.status === "fail" ? 0 : 1].id, title: f.title, owner: "", start: "", due: day(f.severity === "high" ? 14 : f.severity === "medium" ? 30 : 60), priority: f.severity === "high" ? (f.status === "fail" ? "urgent" : "high") : f.severity === "medium" ? "medium" : "low",
+        labels: [labels.find(l => l.key === f.cat)?.id].filter(Boolean), created: Date.now(),
+        desc: [`Site: ${d.url}`, f.found?.length ? `Evidence: ${f.found.join(" | ")}` : "", f.why ? `Why it matters: ${f.why}` : "", f.fix ? `How to fix: ${f.fix}` : "", laws.length ? `Laws: ${laws.join(" || ")}` : "", `From an AI Benar audit on ${new Date(d.id).toLocaleDateString()}. A guide, not legal advice.`].filter(Boolean).join("\n\n"),
+        checklist: [{ id: id(), t: "Fix applied", done: false }, { id: id(), t: "Re-tested with AI Benar", done: false }] }; });
+    if (!cards.length) return alert("No problems or checks to turn into a board.");
+    const doc = { id: id(), type: "board", title: `Compliance actions: ${d.host}`, created: Date.now(), updated: Date.now(), data: { view: "kanban", columns: cols, cards, labels: labels.map(({ key, ...l }) => l), people: [] } };
+    const json = new TextEncoder().encode(JSON.stringify({ kind: "ifleavesweave-doc", v: 1, from: "ai-benar", doc })), gz = new Uint8Array(await new Response(new Blob([json]).stream().pipeThrough(new CompressionStream("gzip"))).arrayBuffer());
+    let bin = ""; for (let i = 0; i < gz.length; i += 8192) bin += String.fromCharCode(...gz.subarray(i, i + 8192));
+    const b64 = btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+    chrome.tabs.create({ url: `${BOARDS_URL}#import=${b64}` });
+  };
   $("#json").onclick = () => download(`ai-benar-${d.host}-${new Date(d.id).toISOString().slice(0, 10)}.json`, JSON.stringify({ site: d.url, audited: new Date(d.id).toISOString(), mode: d.mode, grade: S.grade, score: S.score, jurisdictions: J, findings: rows, thirdParties: tp }, null, 2), "application/json");
   $("#csv").onclick = () => { const cols = Object.keys(rows[0]); download(`ai-benar-${d.host}.csv`, "\ufeff" + [cols, ...rows.map(r => cols.map(c => r[c]))].map(r => r.map(x => { const s = String(x); const q = /^[=+\-@]/.test(s) ? "'" + s : s; return /[",\n]/.test(q) ? `"${q.replace(/"/g, '""')}"` : q; }).join(",")).join("\r\n"), "text/csv"); };
   $("#retest").onclick = async () => {
@@ -132,7 +152,7 @@ function renderWelcome(v) {
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px"><a class="btn primary" href="#navigator">Start the readiness navigator</a><a class="btn" href="#atlas">Explore the AI and data atlas</a><a class="btn" href="#laws">Choose your laws</a></div></div>
     <div class="card"><b>Built for small teams</b><p class="muted" style="margin:.4rem 0 0">Schools, charities, NGOs and non-profits across different countries can check their own websites and get a plain-language plan in the Readiness navigator.</p></div></section>
   <section class="steps"><div class="card"><b>1. Open a website</b><p class="muted" style="margin:.3rem 0 0">Your own site, or one you’re assessing, such as a supplier or partner.</p></div><div class="card"><b>2. Click “Audit this site”</b><p class="muted" style="margin:.3rem 0 0">Then “Re-test as a new visitor” to check what loads before consent.</p></div><div class="card"><b>3. Fix and share</b><p class="muted" style="margin:.3rem 0 0">Each finding says why it matters and what to do. Save the report as a PDF for your board or IT provider.</p></div></section>
-  <p style="margin-top:20px">Need a hand acting on this? <a href="https://suhaimizainalshah.github.io/Compliscope-Advisory/" target="_blank" rel="noopener">AI Benar Advisory</a> offers independent AI compliance and governance support.</p>
+  <p style="margin-top:20px">Need a hand acting on this? <a href="https://suhaimizainalshah.github.io/AI-Benar-Advisory/" target="_blank" rel="noopener">AI Benar Advisory</a> offers independent AI compliance and governance support.</p>
   <p class="disc">AI Benar checks what any visitor’s browser sees, and re-requests the page once for its headers. It never probes servers or tests for break-ins, and it sends nothing anywhere except the site being audited. For deeper testing, get written permission from the site owner and use a qualified professional. Not legal advice.</p>`;
 }
 route();

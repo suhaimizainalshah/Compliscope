@@ -26,6 +26,14 @@ async function audit(tab, mode = "current") {
   for (const r of data.resources) for (const [re, name] of URL_LIBS) { const m = r.url.match(re); if (m && !data.libs.some(l => l.name === name)) data.libs.push({ name, version: m[1], fromUrl: true }); }
   try { data.cookies = (await chrome.cookies.getAll({ url: tab.url })).map(c => ({ name: c.name, domain: c.domain, secure: c.secure, httpOnly: c.httpOnly, sameSite: c.sameSite, session: c.session, expires: c.expirationDate || 0 })); data.cookieSource = "browser"; }
   catch { data.cookies = (data.cookiesJs || []).map(n => ({ name: n, domain: data.host, secure: null, httpOnly: null, sameSite: "unspecified", session: false })); data.cookieSource = "page"; }
+  // Accessibility: axe-core (MPL 2.0, vendor/axe.min.js) checks WCAG 2.x A and AA rules that can be tested automatically
+  try {
+    await chrome.scripting.executeScript({ target: { tabId: tab.id }, files: ["vendor/axe.min.js"] });
+    const [{ result: ax }] = await chrome.scripting.executeScript({ target: { tabId: tab.id }, func: async () => {
+      if (!window.axe) return null; const r = await window.axe.run(document, { runOnly: { type: "tag", values: ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"] }, resultTypes: ["violations"] });
+      return { version: window.axe.version, violations: r.violations.map(v => ({ id: v.id, impact: v.impact, help: v.help, url: v.helpUrl, tags: v.tags.filter(t => /^wcag\d/.test(t)), count: v.nodes.length, sample: v.nodes.slice(0, 3).map(n => String(n.target?.[0] || "").slice(0, 120)) })) }; } });
+    data.a11y = ax;
+  } catch { data.a11y = null; }
   data.resources = data.resources.slice(0, 600); data.mode = mode; data.tabId = tab.id; data.id = Math.max(Date.now(), lastId + 1); lastId = data.id;
   const { audits = {} } = await chrome.storage.local.get("audits"); audits[data.id] = data;
   const keys = Object.keys(audits).sort(); keys.slice(0, Math.max(0, keys.length - 25)).forEach(k => delete audits[k]);
