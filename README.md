@@ -33,6 +33,21 @@ Runs **axe-core**, the open-source accessibility engine, on the page and reports
 ### Turn findings into an action board
 **Make an action board** opens the problems as a board in **If Leaves Weave Boards**: each problem becomes a card in *To fix* or *To check*, with a priority, a due date (14 days for high, 30 for medium), the evidence, the fix, the relevant laws and a short checklist. The board travels in the link’s “#” part, which browsers never send to a server, and If Leaves Weave saves it on your device and removes it from the address bar. Change `BOARDS_URL` in `app.js` if you host If Leaves Weave elsewhere.
 
+### Evidence packs and versioned regulatory profiles
+**Evidence pack** saves a reproducible record of an audit as one JSON file:
+- **Tool and data versions:** the AI Benar version, the rule set (for example `ai-benar-rules@2026.11.23`), the regulatory profiles (`ai-benar-regulatory-profiles@2026.11.23`) and the vulnerability, cookie and accessibility data used.
+- **Measurement conditions:** the page, when it was measured, whether it was a first visit before consent or loaded with your existing cookies and choices, and the browser, language and time zone.
+- **Profiles applied:** each law as a dated profile (for example `EU_GDPR@2026-11-23`), so findings can be re-read against exactly the rules that applied.
+- **Observations kept separate from findings:** cookies, resources, libraries, forms, banners and accessibility results, then each finding with its evidence and legal provisions.
+- **Reproduction steps and limits.**
+- **SHA-256 fingerprints** of the observations, the findings and the whole pack. **Verify a pack** recomputes them and shows whether, and which part of, a pack has changed since export.
+
+**Privacy:** cookie values are never included, and web-address parameter values are removed wherever they appear (names are kept, so the evidence still shows that, say, a tracking parameter was sent).
+
+**Design reference:** the EDPS Website Evidence Collector and the OpenWPM web-measurement platform: raw observations separate from conclusions, recorded measurement conditions, versioned rules and verifiable output. Only their design ideas are used; no code is copied.
+
+**Before every update:** check each covered law for amendments, commencement dates, delays, withdrawals and new regulator guidance; update its entry and `reviewed` date in `laws.js`, bump `META` there and `RULESET` in `rules.js` when anything changes.
+
 ### Laws you can choose
 EU GDPR and ePrivacy and the EU AI Act are **on by default**. You can add: UK GDPR, DPA 2018 and PECR; Singapore PDPA and AI frameworks; Malaysia PDPA; Indonesia PDP Law; Vietnam PDP Law and AI Law; Thailand PDPA; Philippines Data Privacy Act; India DPDP Act and IT Rules; Pakistan PECA and National AI Policy; China PIPL and AI rules; Australia Privacy Act; California CCPA/CPRA; US federal and other states; Brazil LGPD; South Africa POPIA; Kenya Data Protection Act; Nigeria Data Protection Act. Each finding lists the matching sections for every law you choose. Laws with newer or less settled numbering are marked “check the official text”.
 

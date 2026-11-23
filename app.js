@@ -42,7 +42,7 @@ async function renderAudit(v, id) {
     <div class="grade" style="background:${GC[S.grade]}" role="img" aria-label="Grade ${S.grade}, score ${S.score} out of 100"><div>${S.grade}<small>${S.score}/100</small></div></div>
     <div><h1>${esc(d.host)}</h1><div class="meta"><span>${esc((d.title || "").slice(0, 90))}</span><span>${new Date(d.id).toLocaleString()}</span><span>${d.mode === "first-visit" ? "Tested as a new visitor" : "Tested in your current session"}</span></div>
       <div class="lawbar"><span class="muted" style="font-size:13px">Checked against</span>${J.map(k => `<span class="lawchip">${esc(LAWS[k]?.short || k)}</span>`).join("")}<span class="lawchip">Security basics</span><a href="#laws" style="font-size:13px;font-weight:650">Change</a></div></div>
-    <div class="actions"><button class="btn primary" id="retest" title="Clears this site’s cookies and storage, reloads it and audits again">Re-test as a new visitor</button><button class="btn" id="pdf">Save as PDF</button><button class="btn" id="json">JSON</button><button class="btn" id="csv">CSV</button><button class="btn" id="board" title="Open these findings as an action board in If Leaves Weave Boards">Make an action board</button></div>
+    <div class="actions"><button class="btn primary" id="retest" title="Clears this site’s cookies and storage, reloads it and audits again">Re-test as a new visitor</button><button class="btn" id="pdf">Save as PDF</button><button class="btn" id="json">JSON</button><button class="btn" id="csv">CSV</button><button class="btn" id="board" title="Open these findings as an action board in If Leaves Weave Boards">Make an action board</button><button class="btn" id="evidence" title="Observations, findings, the rule and law versions used, and SHA-256 fingerprints">Evidence pack</button><label class="btn" title="Check that an evidence pack has not been changed since it was exported">Verify a pack<input type="file" id="verifyPack" accept=".json,application/json" hidden></label></div>
   </section>
   ${d.mode !== "first-visit" ? `<p class="card noprint" style="margin-top:12px;padding:12px 16px;font-size:14px">For the most accurate consent results, use <b>Re-test as a new visitor</b>. It clears only this site’s cookies and storage in your browser, reloads the page, and checks what loads before any choice is made.</p>` : ""}
   <section class="sum">${Object.entries(CAT).map(([c, n]) => `<div class="card"><h3><span>${n}</span></h3><div class="pills">${count(c, "fail") ? `<span class="pill"><i class="bgfail"></i>${count(c, "fail")} problem${count(c, "fail") > 1 ? "s" : ""}</span>` : ""}${count(c, "warn") ? `<span class="pill"><i class="bgwarn"></i>${count(c, "warn")} to check</span>` : ""}${count(c, "pass") ? `<span class="pill"><i class="bgpass"></i>${count(c, "pass")} good</span>` : ""}${count(c, "info") ? `<span class="pill"><i class="bginfo"></i>${count(c, "info")} note${count(c, "info") > 1 ? "s" : ""}</span>` : ""}</div></div>`).join("")}</section>
@@ -78,6 +78,47 @@ async function renderAudit(v, id) {
     const b64 = btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
     chrome.tabs.create({ url: `${BOARDS_URL}#import=${b64}` });
   };
+
+  /* ---------- Evidence pack: a reproducible record of this audit ----------
+     Design reference: the EDPS Website Evidence Collector and the OpenWPM measurement platform (ideas only, no code):
+     raw observations kept separate from conclusions, the measurement conditions recorded, the versions of the rules
+     and regulatory profiles applied, and fingerprints so anyone can check the pack has not been changed.
+     Privacy: cookie values are never included, and web-address parameter values are removed (names are kept). */
+  const canon = v => Array.isArray(v) ? `[${v.map(canon).join(",")}]` : v && typeof v === "object" ? `{${Object.keys(v).sort().map(k => JSON.stringify(k) + ":" + canon(v[k])).join(",")}}` : JSON.stringify(v ?? null);
+  const sha256 = async txt => [...new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(txt)))].map(b => b.toString(16).padStart(2, "0")).join("");
+  const scrubUrl = u => { try { const x = new URL(u); [...x.searchParams.keys()].forEach(k => x.searchParams.set(k, "")); x.hash = ""; return x.toString(); } catch { return u; } };
+  // remove parameter values wherever they appear (full or relative addresses, or inside a sentence); names are kept
+  const scrubText = t => String(t).replace(/https?:\/\/[^\s"'<>)]+/g, m => scrubUrl(m)).replace(/([?&][\w.%\[\]-]+)=([^&\s#"'<>)]*)/g, "$1=");
+  const scrub = (v, key) => { if (typeof v === "string") return scrubText(v); if (Array.isArray(v)) return v.map(x => scrub(x, key)); if (v && typeof v === "object") { const o = {}; for (const [k, x] of Object.entries(v)) { if (k === "value" && key === "cookies") continue; o[k] = scrub(x, k === "cookies" ? "cookies" : key); } return o; } return v; };
+  async function evidencePack() {
+    const L = globalThis.COMPLISCOPE_LAWS, RS = globalThis.COMPLISCOPE_RULES.RULESET, man = chrome.runtime.getManifest();
+    const observations = scrub({ url: d.url, mode: d.mode, cookieSource: d.cookieSource, cookies: d.cookies || [], resources: d.resources || [], libs: d.libs || [], forms: d.forms || [], chat: d.chat || null, banner: d.banner || null, headers: d.headers || null, tcf: d.tcf || null, gpp: d.gpp || null, a11y: d.a11y || null });
+    const findings = scrub(F.map(f => ({ id: f.id, category: f.cat, status: f.status, severity: f.severity, title: f.title, evidence: f.found || [], why: f.why || "", fix: f.fix || "", laws: R.refsFor(f, J).map(r => ({ profile: L.LAWS[r.law]?.profile || r.law, name: r.name, provisions: r.refs })) })));
+    const MODES = { first: "First visit, before any consent choice (fresh browser state)", current: "As loaded in your browser, with your existing cookies and consent choices" };
+    const pack = {
+      schema: "ai-benar-evidence-pack", schemaVersion: 1,
+      tool: { name: "AI Benar", version: man.version, ruleset: `${RS.id}@${RS.version}`, regulatoryProfiles: `${L.META.id}@${L.META.version}`, data: { vulnerabilities: "retire.js repository extract (vendor/vulns.js)", cookies: "Open Cookie Database extract (vendor/cookies.js)", accessibility: d.a11y?.version ? `axe-core ${d.a11y.version}` : "not run" } },
+      measurement: { site: scrubUrl(d.url), host: d.host, measuredAt: new Date(d.id).toISOString(), exportedAt: new Date().toISOString(), conditions: MODES[d.mode] || String(d.mode || "As loaded"), mode: d.mode || "", collector: "AI Benar Chrome extension, in the audited tab (no server)", browser: navigator.userAgent, language: navigator.language, timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone },
+      profilesApplied: J.map(k => ({ id: k, name: L.LAWS[k]?.name || k, profile: L.LAWS[k]?.profile || k, reviewed: L.LAWS[k]?.reviewed || "" })),
+      summary: { grade: S.grade, score: S.score, problems: F.filter(f => f.status === "fail").length, checks: F.filter(f => f.status === "warn").length, passed: F.filter(f => f.status === "pass").length },
+      observations, findings,
+      reproduce: ["Install the AI Benar version above and open the same site in a fresh browser profile, with no stored cookies.", "Run the audit in the same conditions (for example, first visit before consent).", "Compare the new observations with these. Sites change, so differences can be genuine changes rather than errors.", "Findings depend on the rule set and regulatory profile versions above: re-read old packs against those versions."],
+      limits: ["A snapshot of one page load in one browser, not the whole site or every visitor’s experience.", "Automated checks find some issues, not all; accessibility checks cover only part of WCAG.", "A guide for compliance work, not legal advice."],
+    };
+    pack.integrity = { algorithm: "SHA-256 over canonical JSON (keys sorted)", observations: await sha256(canon(observations)), findings: await sha256(canon(findings)) };
+    pack.integrity.pack = await sha256(canon({ ...pack, integrity: { ...pack.integrity, pack: undefined } }));
+    download(`ai-benar-evidence-${d.host}-${new Date(d.id).toISOString().slice(0, 10)}.json`, JSON.stringify(pack, null, 2), "application/json");
+  }
+  async function verifyPack(file) {
+    try {
+      const p = JSON.parse(await file.text()); if (p.schema !== "ai-benar-evidence-pack") return alert("That file isn’t an AI Benar evidence pack.");
+      const okObs = await sha256(canon(p.observations)) === p.integrity?.observations, okFind = await sha256(canon(p.findings)) === p.integrity?.findings;
+      const okPack = await sha256(canon({ ...p, integrity: { ...p.integrity, pack: undefined } })) === p.integrity?.pack;
+      alert(okObs && okFind && okPack ? `Unchanged since it was exported.\n\nSite: ${p.measurement.site}\nMeasured: ${p.measurement.measuredAt}\nRules: ${p.tool.ruleset}\nProfiles: ${p.tool.regulatoryProfiles}` : `This pack has been changed since it was exported.\n\nObservations ${okObs ? "match" : "DO NOT match"} · findings ${okFind ? "match" : "DO NOT match"} · whole pack ${okPack ? "matches" : "DOES NOT match"}.`);
+    } catch { alert("Couldn’t read that file."); }
+  }
+  $("#evidence").onclick = evidencePack;
+  $("#verifyPack").onchange = e => { const f = e.target.files[0]; e.target.value = ""; if (f) verifyPack(f); };
   $("#json").onclick = () => download(`ai-benar-${d.host}-${new Date(d.id).toISOString().slice(0, 10)}.json`, JSON.stringify({ site: d.url, audited: new Date(d.id).toISOString(), mode: d.mode, grade: S.grade, score: S.score, jurisdictions: J, findings: rows, thirdParties: tp }, null, 2), "application/json");
   $("#csv").onclick = () => { const cols = Object.keys(rows[0]); download(`ai-benar-${d.host}.csv`, "\ufeff" + [cols, ...rows.map(r => cols.map(c => r[c]))].map(r => r.map(x => { const s = String(x); const q = /^[=+\-@]/.test(s) ? "'" + s : s; return /[",\n]/.test(q) ? `"${q.replace(/"/g, '""')}"` : q; }).join(",")).join("\r\n"), "text/csv"); };
   $("#retest").onclick = async () => {

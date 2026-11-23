@@ -144,5 +144,6 @@
     if (f.standards && STANDARDS[f.standards]) out.push({ law: "STD", name: "Security standards", refs: STANDARDS[f.standards], verify: false });
     return out;
   }
-  globalThis.COMPLISCOPE_RULES = { audit, score, refsFor };
+  const RULESET = { id: "ai-benar-rules", version: "2026.11.23" }; // bump with any change to a rule, its wording or its severity
+  globalThis.COMPLISCOPE_RULES = { audit, score, refsFor, RULESET };
 })();

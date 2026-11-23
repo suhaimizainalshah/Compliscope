@@ -236,5 +236,10 @@
     cookies: ["OWASP Session Management Cheat Sheet"], sri: ["OWASP Top 10 (2021) A08: Software and Data Integrity Failures"], securitytxt: ["RFC 9116 (security.txt)"],
     forms: ["OWASP Top 10 (2021) A02 and A04"], disclosure: ["OWASP Top 10 (2021) A05 (information disclosure)"], ai_client: ["OWASP Top 10 for LLM Applications: LLM02 and LLM10"],
   };
-  globalThis.COMPLISCOPE_LAWS = { LAWS, STANDARDS, DEFAULT: Object.keys(LAWS).filter(k => LAWS[k].default) };
+  /* Versioned regulatory profiles. Every finding records which profile produced it (for example "EU_AIACT@2026-11-23"),
+     so an evidence pack can be re-read against exactly the rules that applied. BEFORE EVERY UPDATE: check each law for
+     amendments, commencements, delays and new guidance, update its entry, and set its `reviewed` date (and META). */
+  const META = { id: "ai-benar-regulatory-profiles", version: "2026.11.23", reviewed: "2026-11-23" };
+  Object.entries(LAWS).forEach(([k, law]) => { law.reviewed ||= META.reviewed; law.profile = `${k}@${law.reviewed}`; });
+  globalThis.COMPLISCOPE_LAWS = { LAWS, STANDARDS, META, DEFAULT: Object.keys(LAWS).filter(k => LAWS[k].default) };
 })();
