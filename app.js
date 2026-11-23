@@ -9,7 +9,7 @@ function toast(m) { const t = $("#toast"); t.textContent = m; t.classList.add("o
 async function getJ() { const { jurisdictions } = await chrome.storage.sync.get("jurisdictions"); return jurisdictions?.length ? jurisdictions : DEFAULT; }
 async function getAudits() { const { audits = {} } = await chrome.storage.local.get("audits"); return audits; }
 /* If Leaves Weave Boards address. Change this if you host If Leaves Weave somewhere else. */
-const BOARDS_URL = "https://suhaimizainalshah.github.io/ifleavesweave/boards.html";
+const BOARDS_URL = "https://suhaimizainalshah.github.io/if-leaves-weave/boards.html";
 function download(name, text, type) { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([text], { type })); a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 4000); }
 
 /* ---------- router ---------- */

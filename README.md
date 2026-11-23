@@ -69,7 +69,7 @@ It only makes **passive** checks: it reads what any visitor’s browser receives
 Works in Chrome 116 or later and other Chromium browsers. Shortcuts: **Alt+Shift+K** opens AI Benar, **Alt+Shift+U** audits the current site.
 
 ## Publish on the Chrome Web Store
-Zip the extension files into `ai-benar-extension.zip` and upload it, copy the text from `store/STORE_LISTING.md`, add the screenshots in `store/`, and use `https://github.com/suhaimizainalshah/Compliscope/blob/main/PRIVACY.md` as the privacy policy URL.
+Zip the extension files into `ai-benar-extension.zip` and upload it, copy the text from `store/STORE_LISTING.md`, add the screenshots in `store/`, and use `https://github.com/suhaimizainalshah/ai-benar/blob/main/PRIVACY.md` as the privacy policy URL.
 
 ## Files
 ```

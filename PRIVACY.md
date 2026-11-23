@@ -24,4 +24,4 @@ You can delete audits in *History* and clear your answers with *Start again*.
 Results are indicative and based on passive checks. Check the official text of each law, or ask a qualified adviser, before making important decisions.
 
 ## Contact
-Open an issue at https://github.com/suhaimizainalshah/Compliscope
+Open an issue at https://github.com/suhaimizainalshah/ai-benar
