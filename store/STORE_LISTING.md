@@ -56,4 +56,4 @@ Check websites for privacy, AI transparency and basic security issues, and help 
 Does not collect or transmit any user data.
 
 ## Privacy policy URL
-https://github.com/suhaimizainalshah/Compliscope/blob/main/PRIVACY.md
+https://github.com/suhaimizainalshah/ai-benar/blob/main/PRIVACY.md
