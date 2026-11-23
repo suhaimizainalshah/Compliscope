@@ -229,6 +229,48 @@
         security: ["NDPA s39 (security measures)"], special: ["NDPA s30 (sensitive personal data)"], children: ["NDPA s31 (children)"], breach: ["NDPA s40 (breach notification)"],
       },
     },
+    QA: {
+      name: "Qatar PDPPL (Law No. 13 of 2016)", short: "Qatar", region: "Arab Gulf · Qatar", url: "https://www.ncsa.gov.qa/", reviewed: "2026-11-23",
+      note: "Applies to processing in Qatar. Firms in the Qatar Financial Centre follow the QFC Data Protection Regulations instead. Regulator: the National Data Privacy Office of the National Cyber Security Agency (NCSA).",
+      refs: {
+        consent_cookies: ["PDPPL Art. 4 (processing only with consent or for a lawful purpose)", "NCSA Principles of Data Privacy Guideline"], dark_patterns: ["PDPPL Art. 4 and NCSA guidelines (consent must be clear and informed)"], prechecked: ["NCSA guidelines (consent needs a clear, affirmative action)"],
+        transparency: ["PDPPL Art. 9 and NCSA Privacy Notice Guideline (tell people about processing before it starts)"], contact: ["NCSA Privacy Notice Guideline (how to contact the controller)"],
+        transfers: ["PDPPL Art. 15 (cross-border flows may not be restricted unless they breach the law or may cause serious harm)"], security: ["PDPPL Art. 11 and Art. 13 (precautions to protect personal data; impact assessment)"], minimisation: ["NCSA Principles of Data Privacy Guideline (collect only what the purpose needs)"],
+        special: ["PDPPL Art. 16 (personal data of a special nature, such as health, religion and children: permission from the regulator before processing)"], children: ["PDPPL Art. 17 (websites aimed at children must publish a policy on handling children’s data)"],
+        breach: ["PDPPL Art. 13–14 (notify the regulator and affected people of breaches that may cause serious damage; NCSA guidelines: within 72 hours)"], records: ["NCSA Records of Processing Activities Guideline"], dpo: ["NCSA guidelines (a personal data management system with clear responsibilities)"],
+        marketing: ["PDPPL Art. 22 (prior consent before direct marketing by electronic communications)"],
+        ai_disclosure: ["NCSA Guidelines for Secure Adoption and Usage of AI (voluntary)"], ai_deepfake: ["Law No. 14 of 2014 on Combating Cybercrimes (false or harmful content online)"],
+        ai_highrisk: ["Qatar Central Bank Artificial Intelligence Guideline (2024): binding on QCB-licensed financial institutions"], ai_literacy: ["NCSA Guidelines for Secure Adoption and Usage of AI: governance and training (voluntary)"],
+      },
+    },
+    AE: {
+      name: "UAE PDPL (Federal Decree-Law No. 45 of 2021)", short: "UAE", region: "Arab Gulf · United Arab Emirates", url: "https://uaelegislation.gov.ae/en/legislations/1972", reviewed: "2026-11-23",
+      note: "In force since 2 January 2022, but its Executive Regulations, which set breach deadlines, DPO thresholds and penalties, have not been published. Free zones have their own laws: the DIFC Data Protection Law No. 5 of 2020 (with Regulation 10 on autonomous systems, including AI) and the ADGM Data Protection Regulations 2021.",
+      refs: {
+        consent_cookies: ["PDPL Art. 4 (processing without consent only in listed cases)", "PDPL Art. 6(1) (conditions for valid consent)"], dark_patterns: ["PDPL Art. 6(1) (consent must be specific, clear and unambiguous)", "PDPL Art. 6(2) (consent can be withdrawn at any time)"], prechecked: ["PDPL Art. 6(1) (consent by a clear affirmative statement or action)"],
+        transparency: ["PDPL Art. 13 (right to information about the processing)"], contact: ["PDPL Art. 13 (information about the controller and how to exercise rights)"],
+        transfers: ["PDPL Art. 22 (transfers to countries approved as adequate)", "PDPL Art. 23 (other transfers only on listed grounds, such as a contract or express consent)"], security: ["PDPL Art. 20 (technical and organisational security measures)"], minimisation: ["PDPL Art. 5 (processing limited to what the purpose needs)"],
+        special: ["PDPL Art. 1 (definition of sensitive personal data)", "PDPL Art. 21 (impact assessment for high-risk processing, including sensitive data)"], children: ["No specific rule on children’s data in the PDPL: apply the general consent and fairness rules with extra care"],
+        breach: ["PDPL Art. 9 (notify the UAE Data Office and affected people; the deadline is to be set by the Executive Regulations)"], records: ["PDPL Art. 7 (controller obligations, including keeping a record of processing)"], dpo: ["PDPL Art. 10–11 (appoint a data protection officer where required)"],
+        marketing: ["TDRA rules on unsolicited electronic communications"],
+        ai_disclosure: ["UAE Charter for the Development and Use of Artificial Intelligence (2024): transparency (voluntary)"], ai_deepfake: ["Federal Decree-Law No. 34 of 2021 on Combating Rumours and Cybercrimes"],
+        ai_highrisk: ["DIFC Data Protection Regulations, Regulation 10 (autonomous and semi-autonomous systems): binding in the DIFC only", "UAE Charter for AI: human oversight and fairness (voluntary)"], ai_literacy: ["UAE Charter for AI and national AI strategy guidance (voluntary)"],
+      },
+    },
+    SA: {
+      name: "Saudi Arabia PDPL (Royal Decree M/19, amended)", short: "Saudi Arabia", region: "Arab Gulf · Saudi Arabia", url: "https://sdaia.gov.sa/", reviewed: "2026-11-23",
+      note: "Fully enforced by SDAIA since 14 September 2024, with Implementing Regulations and Transfer Regulations. Proposed amendments to the Implementing Regulations (consultation from 6 October to 5 November 2026) would tighten breach notification and add data localisation: check whether they have been adopted.",
+      refs: {
+        consent_cookies: ["PDPL Art. 5–8 (lawful bases and consent)", "Implementing Regulations Art. 11 (standards for valid consent)"], dark_patterns: ["Implementing Regulations Art. 11 (consent must be clear and specific)", "Implementing Regulations Art. 12 (withdrawing consent)"], prechecked: ["Implementing Regulations Art. 11 (consent needs a positive action, such as ticking an unticked box)"],
+        transparency: ["PDPL Art. 12 (a privacy policy available before collection)", "PDPL Art. 13 (information at the time of collection, including transfers abroad)"], contact: ["PDPL Art. 12 and Art. 13 (who the controller is and how to contact them)"],
+        transfers: ["PDPL Art. 29 (transfers outside the Kingdom only in limited cases)", "Regulation on Personal Data Transfer outside the Kingdom"], security: ["PDPL Art. 19 (organisational, administrative and technical security measures)", "NCA Essential Cybersecurity Controls"], minimisation: ["PDPL Art. 11 (collect only what the purpose needs)", "SDAIA Minimum Personal Data Determination Guidelines"],
+        special: ["PDPL Art. 1 (definition of sensitive data) and the Implementing Regulations’ rules on sensitive data"], children: ["SDAIA Children and Incompetents’ Privacy Protection Policy"],
+        breach: ["PDPL Art. 20 (notify SDAIA within 72 hours, and affected people without undue delay)"], records: ["PDPL Art. 31 and Implementing Regulations (record of processing activities)"], dpo: ["SDAIA Rules for Appointing a Personal Data Protection Officer"],
+        marketing: ["PDPL Art. 25 (direct marketing)", "Implementing Regulations Art. 28–29 (consent for marketing)"],
+        ai_disclosure: ["SDAIA Generative AI Guidelines (voluntary)", "SDAIA AI Ethics Principles: transparency (voluntary)"], ai_deepfake: ["SDAIA Deepfakes Guidelines (voluntary)", "Anti-Cyber Crime Law (Royal Decree M/17 of 1428H)"],
+        ai_highrisk: ["SDAIA AI Ethics Principles: fairness, accountability and human oversight (voluntary)", "SDAIA AI Adoption Framework"], ai_literacy: ["SDAIA AI Adoption Framework: governance and skills (voluntary)"],
+      },
+    },
   };
   const STANDARDS = {
     headers: ["OWASP Top 10 (2021) A05: Security Misconfiguration", "OWASP Secure Headers Project"], https: ["OWASP Top 10 (2021) A02: Cryptographic Failures"],
