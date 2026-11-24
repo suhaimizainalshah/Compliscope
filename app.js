@@ -22,6 +22,7 @@ async function route() {
   if (view === "laws") return renderLaws(v);
   if (view === "atlas") return renderAtlas(v, arg);
   if (view === "welcome") return renderWelcome(v);
+  if (view === "check") return renderCheck(v, decodeURIComponent(arg || ""));
   return renderHistory(v);
 }
 addEventListener("hashchange", route);
@@ -192,8 +193,21 @@ function renderWelcome(v) {
   v.innerHTML = `<section class="welcome"><div><h1>Check any website for privacy, AI Act and security issues</h1><p class="muted" style="font-size:1.08rem;margin-top:10px">AI Benar looks at what a website does in your browser: cookies and trackers, consent banners, AI chatbots, forms, security settings and exposed keys. It shows which sections of which laws may be at stake, and how to fix them.</p>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px"><a class="btn primary" href="#navigator">Start the readiness navigator</a><a class="btn" href="#atlas">Explore the AI and data atlas</a><a class="btn" href="#laws">Choose your laws</a></div></div>
     <div class="card"><b>Built for small teams</b><p class="muted" style="margin:.4rem 0 0">Schools, charities, NGOs and non-profits across different countries can check their own websites and get a plain-language plan in the Readiness navigator.</p></div></section>
+  <div class="card" style="margin:14px 0"><b>Quick access from the address bar</b><p class="muted" style="margin:.4rem 0 0">Click Chrome’s address bar and type <kbd>benar</kbd>, then press Enter to check the page you’re on. Type <kbd>benar example.com</kbd> to check another site, or <kbd>benar laws</kbd>, <kbd>benar atlas</kbd>, <kbd>benar navigator</kbd> or <kbd>benar history</kbd>.</p></div>
   <section class="steps"><div class="card"><b>1. Open a website</b><p class="muted" style="margin:.3rem 0 0">Your own site, or one you’re assessing, such as a supplier or partner.</p></div><div class="card"><b>2. Click “Audit this site”</b><p class="muted" style="margin:.3rem 0 0">Then “Re-test as a new visitor” to check what loads before consent.</p></div><div class="card"><b>3. Fix and share</b><p class="muted" style="margin:.3rem 0 0">Each finding says why it matters and what to do. Save the report as a PDF for your board or IT provider.</p></div></section>
   <p style="margin-top:20px">Need a hand acting on this? <a href="https://suhaimizainalshah.github.io/AI-Benar-Advisory/" target="_blank" rel="noopener">AI Benar Advisory</a> offers independent AI compliance and governance support.</p>
   <p class="disc">AI Benar checks what any visitor’s browser sees, and re-requests the page once for its headers. It never probes servers or tests for break-ins, and it sends nothing anywhere except the site being audited. For deeper testing, get written permission from the site owner and use a qualified professional. Not legal advice.</p>`;
 }
 route();
+
+/* ---------- a site typed in the address bar (benar example.com): allowed with a click, then checked ---------- */
+function renderCheck(v, url) {
+  let u; try { u = new URL(url); } catch { v.innerHTML = "<p>That address couldn’t be read.</p>"; return; }
+  v.innerHTML = `<section style="max-width:620px;margin:24px auto;padding:22px;border:1px solid var(--line,#ddd);border-radius:16px"><h2 style="margin-top:0">Check ${u.hostname}</h2>
+    <p>AI Benar needs your permission to read <b>${u.hostname}</b>. It opens the site in a new tab and checks it as it loads, with your existing cookies and choices (nothing is cleared).</p>
+    <p><button class="btn primary" id="go">Allow on ${u.hostname} and check</button></p><p class="muted" id="st" aria-live="polite"></p></section>`;
+  v.querySelector("#go").onclick = async () => { const st = v.querySelector("#st"), origin = u.origin + "/*";
+    const ok = (await chrome.permissions.contains({ origins: [origin] })) || (await chrome.permissions.request({ origins: [origin] })); if (!ok) { st.textContent = "Permission is needed to check this site."; return; }
+    st.textContent = "Opening and checking… this can take up to 30 seconds."; const r = await chrome.runtime.sendMessage({ type: "checkUrl", url: u.href });
+    if (r?.error) st.textContent = "The check didn’t finish: " + r.error; else location.hash = "audit=" + r.id; };
+}

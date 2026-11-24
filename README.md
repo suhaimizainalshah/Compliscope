@@ -1,3 +1,5 @@
+<img src="icons/logo.svg" alt="AI Benar logo" width="80" height="80">
+
 # AI Benar
 
 **A passive privacy, EU AI Act and security checker for any website, plus a readiness navigator for schools, charities, NGOs and non-profits.**
@@ -107,3 +109,6 @@ MIT. Corrections to the law catalogue are especially welcome.
 - **axe-core** 4.14.1 (Mozilla Public License 2.0): `vendor/axe.min.js`, licence in `vendor/LICENSE-axe-core.txt`.
 - **retire.js vulnerability repository** (Apache License 2.0): known vulnerabilities for the JavaScript libraries AI Benar detects, extracted into `vendor/vulns.js`, licence in `vendor/LICENSE-retire.txt`.
 - **Open Cookie Database** (Apache License 2.0): cookie names, purposes and platforms in `vendor/cookies.js`, licence in `vendor/LICENSE-open-cookie-database.txt`.
+
+## Address bar
+Type `benar` and press Enter to check the page you’re on. Type `benar example.com` to check another site (you allow it with one click, and nothing is cleared). Also `benar laws`, `benar atlas`, `benar navigator` and `benar history`.

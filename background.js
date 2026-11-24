@@ -19,6 +19,7 @@ function probe() {
 const URL_LIBS = [[/jquery[.-](\d+\.\d+\.\d+)/i, "jQuery"], [/jquery@(\d+\.\d+\.\d+)/i, "jQuery"], [/jquery-ui[.-](\d+\.\d+\.\d+)/i, "jQuery UI"], [/bootstrap[@/.-](\d+\.\d+\.\d+)/i, "Bootstrap"], [/angular(?:js)?[@/.-](1\.\d+\.\d+)/i, "AngularJS"], [/lodash[@/.-](\d+\.\d+\.\d+)/i, "Lodash"], [/moment[@/.-](\d+\.\d+\.\d+)/i, "Moment.js"], [/handlebars[@/.-](\d+\.\d+\.\d+)/i, "Handlebars"], [/underscore[@/.-](\d+\.\d+\.\d+)/i, "Underscore"]];
 let lastId = 0;
 async function audit(tab, mode = "current") {
+  if (tab?.id && !tab.url) { try { const [{ result }] = await chrome.scripting.executeScript({ target: { tabId: tab.id }, func: () => location.href }); tab = { ...tab, url: result }; } catch {} } // the address can be hidden: ask the page
   if (!/^https?:/.test(tab?.url || "")) throw new Error("AI Benar can only audit websites (http or https pages).");
   const [{ result: data }] = await chrome.scripting.executeScript({ target: { tabId: tab.id }, files: ["trackers.js", "collect.js"] });
   if (!data) throw new Error("The page didn’t respond. Reload it and try again.");
@@ -62,3 +63,25 @@ chrome.runtime.onInstalled.addListener(async ({ reason }) => {
 });
 chrome.contextMenus.onClicked.addListener(async (_i, tab) => { try { const id = await audit(tab); chrome.tabs.create({ url: `app.html#audit=${id}`, index: tab.index + 1 }); } catch {} });
 chrome.commands?.onCommand.addListener(async cmd => { if (cmd !== "audit-site") return; const [tab] = await chrome.tabs.query({ active: true, currentWindow: true }); try { const id = await audit(tab); chrome.tabs.create({ url: `app.html#audit=${id}`, index: tab.index + 1 }); } catch {} });
+
+/* ---------- the address bar ---------- */
+const xesc = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&apos;");
+const activeTab = async () => (await chrome.tabs.query({ active: true, lastFocusedWindow: true }))[0];
+function omni(keyword, def, items, enter) { // items: [word, description]
+  chrome.omnibox.setDefaultSuggestion({ description: def });
+  chrome.omnibox.onInputChanged.addListener((text, suggest) => { const t = text.trim().toLowerCase();
+    suggest(items.filter(([w]) => !t || w.startsWith(t.split(" ")[0])).slice(0, 6).map(([w, d]) => ({ content: w, description: `<match>${xesc(keyword + " " + w)}</match>  <dim>${xesc(d)}</dim>` }))); });
+  chrome.omnibox.onInputEntered.addListener(text => enter(text.trim()));
+}
+// benar: check this page; benar example.com: check another site (after allowing it); benar laws, atlas, navigator, history
+const toUrl = t => { if (!t || /\s/.test(t)) return null; const u = /^https?:\/\//i.test(t) ? t : "https://" + t; try { const x = new URL(u); return /\.[a-z]{2,}$/i.test(x.hostname) ? x.href : null; } catch { return null; } };
+const openApp = h => chrome.tabs.create({ url: chrome.runtime.getURL("app.html#" + h) });
+omni("benar", "AI Benar: press Enter to check <match>this page</match>, or type a site such as <match>example.com</match>",
+  [["check", "Check this page for privacy, AI law and security"], ["laws", "Open the law catalogue"], ["atlas", "Open the AI law atlas"], ["navigator", "Open the readiness navigator"], ["history", "See past checks"]],
+  async t => { const w = t.toLowerCase();
+    if (w === "laws" || w === "law") return openApp("laws"); if (w.startsWith("atlas")) return openApp("atlas"); if (w.startsWith("nav")) return openApp("navigator"); if (w === "history") return openApp("history");
+    const url = toUrl(t); if (url) return openApp("check=" + encodeURIComponent(url)); // another site: allowed on a page, where Chrome lets us ask
+    const tab = await activeTab(); if (!tab?.id || (tab.url && !/^https?:/.test(tab.url))) return openApp("history"); // the address can be hidden: only a known non-web page stops here
+    try { const id = await audit(await chrome.tabs.get(tab.id)); openApp("audit=" + id); } catch (e) { openApp("history"); } });
+// check another address without clearing its cookies (unlike the re-test, which tests as a new visitor)
+chrome.runtime.onMessage.addListener((m, _s, reply) => { if (m.type !== "checkUrl") return; (async () => { try { let tab = await chrome.tabs.create({ url: m.url, active: true }); await waitLoad(tab.id); tab = await chrome.tabs.get(tab.id); reply({ id: await audit(tab) }); } catch (e) { reply({ error: e.message }); } })(); return true; });
