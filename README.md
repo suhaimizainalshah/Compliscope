@@ -1,5 +1,3 @@
-<img src="icons/logo.svg" alt="AI Benar logo" width="80" height="80">
-
 # AI Benar
 
 **A passive privacy, EU AI Act and security checker for any website, plus a readiness navigator for schools, charities, NGOs and non-profits.**
